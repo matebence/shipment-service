@@ -1,0 +1,22 @@
+{
+  "name": "shipment-service",
+  "version": "1.0.0",
+  "description": "Shipment service for Blesk microservice application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matebence/shipments-service.git"
+  },
+  "keywords": [
+    "Microservices"
+  ],
+  "author": "Bence Máté",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matebence/shipments-service/issues"
+  },
+  "homepage": "https://github.com/matebence/shipments-service#readme"
+}
