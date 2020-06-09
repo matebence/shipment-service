@@ -21,6 +21,7 @@
   "homepage": "https://github.com/matebence/shipments-service#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cloud-config-client": "^1.5.2",
     "express": "^4.17.1"
   },
   "devDependencies": {
