@@ -16,6 +16,7 @@ client.load({
     config.bootstrap = node;
 
     require("./app/component/eureka.component")(app, config);
+    require("./app/component/zipkin.component")(app, config);
 
     return app.listen(node.server.port);
 }).then(() => {
