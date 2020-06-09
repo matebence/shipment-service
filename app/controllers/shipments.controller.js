@@ -24,6 +24,42 @@ exports.create = {
         next();
     },
     validate: [
+        check('courierId')
+            .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
+        check('parcelId')
+            .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
+        check('from')
+            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
+            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
+        check('to')
+            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
+            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
+        check('statusId')
+            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
+        check('price')
+            .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
+        check('express')
+            .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
+        check('confirmed')
+            .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
+        check('startDate')
+            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+        check('endDate')
+            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+
+        (req, res, next) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SERVER_VALIDATION_ERR,
+                    error: true,
+                    validations: errors.array(),
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+            next()
+        }
     ],
     inDatabase: (req, res, next) => {
         return Promise.all([Shipments.startSession(), Shipments(req.body).save()]).then(([session, data]) => {
@@ -119,6 +155,44 @@ exports.update = {
         next();
     },
     validate: [
+        check('id')
+            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
+        check('courierId')
+            .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
+        check('parcelId')
+            .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
+        check('from')
+            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
+            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
+        check('to')
+            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
+            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
+        check('statusId')
+            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
+        check('price')
+            .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
+        check('express')
+            .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
+        check('confirmed')
+            .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
+        check('startDate')
+            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+        check('endDate')
+            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+
+        (req, res, next) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SERVER_VALIDATION_ERR,
+                    error: true,
+                    validations: errors.array(),
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+            next()
+        }
     ],
     inDatabase: (req, res, next) => {
         return Promise.all([Shipments.startSession(), Shipments.findByIdAndUpdate(req.params.id, req.body)]).then(([session, data]) => {

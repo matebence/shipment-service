@@ -30,7 +30,16 @@ module.exports = {
     STATUS_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`,
     STATUS_UNIQUE: `Státus zásielky už existuje`,
 
-
+    SHIPMENT_COURIER_ID_INT: `Nesprávný formát identifikacného čísla kuriéra`,
+    SHIPMENT_PARCEL_ID_INT: `Nesprávný formát identifikacného čísla balíka`,
+    SHIPMENT_TO_LENGHT: `Minimálna dlžka názvu miesta dodania je 3 a maximalná je 64`,
+    SHIPMENT_TO_ASCII: `Nesprávný formát názvu miesta dodania`,
+    SHIPMENT_FROM_LENGHT: `Minimálna dlžka názvu miesta je 3 a maximalná je 64`,
+    SHIPMENT_FROM_ASCII: `Nesprávný formát názvu miesta`,
+    SHIPMENT_PRICE_FLOAT: `Nesprávný formát ceny zásielky`,
+    SHIPMENT_EXPRESS_BOOLEAN: `Nesprávný formát hodnoty express dodania`,
+    SHIPMENT_CONFIRMED_BOOLEAN: `Nesprávný formát hodnoty potvrdenia`,
+    SHIPMENT_DATE: `Nesprávný formát dátumu`,
     SHIPMENT_MONGO_ID: `Nesprávný formát identifikacného čísla`,
     SHIPMENT_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
     SHIPMENT_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`
