@@ -22,8 +22,12 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "cloud-config-client": "^1.5.2",
+    "cors": "^2.8.5",
     "eureka-js-client": "^4.5.0",
     "express": "^4.17.1",
+    "express-hateoas-links": "^1.1.0",
+    "express-validator": "^5.3.0",
+    "helmet": "^3.22.0",
     "ip": "^1.1.5",
     "node-fetch": "^2.6.0",
     "zipkin": "^0.22.0",
