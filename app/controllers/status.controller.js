@@ -10,7 +10,15 @@ const DEFAULT_PAGE_NUMBER = 1;
 
 exports.create = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER']) && !req.hasPrivilege(['CREATE_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     checkBody: (req, res, next) => {
         if (Object.keys(req.body).length === 0) {
@@ -75,7 +83,15 @@ exports.create = {
 
 exports.delete = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER']) && !req.hasPrivilege(['DELETE_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     validate: [
         check('id')
@@ -127,7 +143,15 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER']) && !req.hasPrivilege(['UPDATE_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     checkBody: (req, res, next) => {
         if (Object.keys(req.body).length === 0) {
@@ -198,7 +222,15 @@ exports.update = {
 
 exports.get = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     validate: [
         check('id')
@@ -252,7 +284,15 @@ exports.get = {
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     validate: [
         check('pageNumber')
@@ -308,7 +348,15 @@ exports.getAll = {
 
 exports.search = {
     authorize: (req, res, next) => {
-        next();
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_STATUS'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
     },
     checkBody: (req, res, next) => {
         if (Object.keys(req.body).length === 0) {
