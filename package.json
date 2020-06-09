@@ -29,6 +29,8 @@
     "express-validator": "^5.3.0",
     "helmet": "^3.22.0",
     "ip": "^1.1.5",
+    "mongoose": "^5.9.18",
+    "mongoose-delete": "^0.5.2",
     "node-fetch": "^2.6.0",
     "zipkin": "^0.22.0",
     "zipkin-context-cls": "^0.22.0",
