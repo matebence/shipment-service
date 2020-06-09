@@ -15,6 +15,8 @@ client.load({
 }).then(config => {
     config.bootstrap = node;
 
+    require("./app/component/eureka.component")(app, config);
+
     return app.listen(node.server.port);
 }).then(() => {
     console.log(`Server beží na porte ${node.server.port}`)
