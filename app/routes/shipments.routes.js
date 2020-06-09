@@ -14,5 +14,5 @@ module.exports = app => {
 
     router.post("/search", shipments.search.authorize, shipments.search.checkBody, shipments.search.inDatabase);
 
-    app.use('/api/vehicles', router);
+    app.use('/api/shipments', router);
 };

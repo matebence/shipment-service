@@ -14,5 +14,5 @@ module.exports = app => {
 
     router.post("/search", status.search.authorize, status.search.checkBody, status.search.inDatabase);
 
-    app.use('/api/types', router);
+    app.use('/api/status', router);
 };
