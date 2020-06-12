@@ -1,7 +1,7 @@
 module.exports = (mongoose, schema, model) => {
+    let preShipment, postShipment;
     const mongooseDelete = require('mongoose-delete');
-    return model("shipments", new schema(
-        {
+    const shipmentSchema = new schema({
             courierId: {
                 type: Number,
                 required: true
@@ -18,7 +18,7 @@ module.exports = (mongoose, schema, model) => {
                 type: String,
                 required: true,
             },
-            statusId: {
+            status: {
                 type: schema.Types.ObjectId,
                 ref: "status",
                 required: true
@@ -43,5 +43,14 @@ module.exports = (mongoose, schema, model) => {
             }
         },
         {collection: "shipments", timestamps: {createdAt: 'createdAt'}}
-    ).plugin(mongooseDelete, {deletedAt: true}));
+    ).plugin(mongooseDelete, {deletedAt: true});
+
+    shipmentSchema.pre('findOneAndUpdate', async function () {
+        preShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
+    });
+    shipmentSchema.post('findOneAndUpdate', async function () {
+        postShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
+    });
+
+    return model("shipments", shipmentSchema);
 };

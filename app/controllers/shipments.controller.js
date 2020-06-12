@@ -10,7 +10,7 @@ const DEFAULT_PAGE_NUMBER = 1;
 
 exports.create = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT']) && !req.hasPrivilege(['CREATE_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -42,7 +42,7 @@ exports.create = {
         check('to')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
             .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
-        check('statusId')
+        check('status')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
         check('price')
             .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
@@ -51,9 +51,9 @@ exports.create = {
         check('confirmed')
             .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
         check('startDate')
-            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
         check('endDate')
-            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -97,7 +97,7 @@ exports.create = {
 
 exports.delete = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER']) && !req.hasPrivilege(['DELETE_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -157,7 +157,7 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['UPDATE_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -191,7 +191,7 @@ exports.update = {
         check('to')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
             .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
-        check('statusId')
+        check('status')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
         check('price')
             .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
@@ -200,9 +200,9 @@ exports.update = {
         check('confirmed')
             .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
         check('startDate')
-            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
         check('endDate')
-            .matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -219,7 +219,7 @@ exports.update = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findByIdAndUpdate(req.params.id, req.body)]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.findOneAndUpdate({_id: req.params.id}, req.body)]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
@@ -250,7 +250,7 @@ exports.update = {
 
 exports.get = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -279,7 +279,7 @@ exports.get = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false }).populate({path:"statusId", model:"status"})]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false }).populate({path:"status", model:"status"})]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
@@ -312,7 +312,7 @@ exports.get = {
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -343,7 +343,7 @@ exports.getAll = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path:"statusId", model:"status"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path:"status", model:"status"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
@@ -376,7 +376,7 @@ exports.getAll = {
 
 exports.search = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT']) && !req.hasPrivilege(['VIEW_SHIPMENTS'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -423,7 +423,7 @@ exports.search = {
             if ((Number(pagination.pageNumber) * Number(pagination.pageSize)) < count) hateosLinks.push({rel: "has-next", method: "POST", href: `${req.protocol}://${req.get('host')}/api/shipments/search`});
         });
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path:"statusId", model:"status"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path:"status", model:"status"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {

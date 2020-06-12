@@ -23,6 +23,7 @@ client.load({
 }).then(config => {
     config.bootstrap = node;
 
+    require("./app/component/nodemailer.component")(app, config);
     require("./app/models")(app, config);
 
     require("./app/component/eureka.component")(app, config);

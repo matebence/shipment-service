@@ -31,7 +31,7 @@
       "parcelId": 1,
       "from": "Nesvady",
       "to": "Nitra",
-      "statusId": "5edf8982ca0d9d132cd3b8df",
+      "status": "5edf8982ca0d9d132cd3b8df",
       "price": 8.50,
       "express": false,
       "confirmed": true,

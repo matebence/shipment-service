@@ -19,9 +19,6 @@ module.exports = (app, config) => {
                 req.hasRole = role => {
                     return contains(jwt.authorities, role)
                 };
-                req.hasPrivilege = privilege => {
-                    return contains(jwt.privileges, privilege)
-                };
 
                 next();
             });
