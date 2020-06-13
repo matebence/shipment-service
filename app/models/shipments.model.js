@@ -1,6 +1,8 @@
 module.exports = (mongoose, schema, model) => {
-    let preShipment, postShipment;
+    const mailer = require('../component/nodemailer.component');
     const mongooseDelete = require('mongoose-delete');
+
+    let preShipment, postShipment;
     const shipmentSchema = new schema({
             courierId: {
                 type: Number,
@@ -50,6 +52,11 @@ module.exports = (mongoose, schema, model) => {
     });
     shipmentSchema.post('findOneAndUpdate', async function () {
         postShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
+        if (!preShipment.status._id.equals(postShipment.status._id)) mailer.sendHTMLMaile(
+            "./resources/templates/shipmentNotification.ejs",
+            {shipmentStatus: postShipment.status.name},
+            {to: "m.bence05@gmail.com",
+             subject: 'Zmena stavu zásielky'});
     });
 
     return model("shipments", shipmentSchema);

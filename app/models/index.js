@@ -1,15 +1,7 @@
 module.exports = (app, config) => {
-    const mailer = require('../component/nodemailer.component');
     const strings = require('../../resources/strings');
     const data = require('../../resources/data.json');
     const mongoose = require("mongoose");
-
-    console.log(mailer.html(
-        "./resources/templates/shipmentNotification.ejs",
-        {shipmentStatus: "Done"},
-        {to: "m.bence05@gmail.com",
-            subject: 'Test'
-        }));
 
     mongoose.connect(`${config.get('node.datasource.driver')}://${config.get('node.datasource.host')}:${config.get('node.datasource.port')}/${config.get('node.datasource.database')}?retryWrites=false`,
         {
