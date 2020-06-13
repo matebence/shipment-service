@@ -2,8 +2,9 @@ module.exports = (app, config) => {
     const strings = require('../../resources/strings');
     const data = require('../../resources/data.json');
     const mongoose = require("mongoose");
+    const redis = require("redis");
 
-    mongoose.connect(`${config.get('node.datasource.driver')}://${config.get('node.datasource.host')}:${config.get('node.datasource.port')}/${config.get('node.datasource.database')}?retryWrites=false`,
+    const mongoClient = mongoose.connect(`${config.get('node.datasource.driver')}://${config.get('node.datasource.host')}:${config.get('node.datasource.port')}/${config.get('node.datasource.database')}?retryWrites=false`,
         {
             useUnifiedTopology: true,
             useFindAndModify: false,
@@ -17,18 +18,27 @@ module.exports = (app, config) => {
         }
     );
 
+    const redisClient = redis.createClient({
+        host: config.get('node.datasource.redis.host'),
+        port: config.get('node.datasource.redis.port'),
+        password: config.get('node.datasource.redis.password')
+    }).on("error", (error) => {
+        console.log(`${strings.REDIS_DATABASE_CONNECTION_ERROR} ${config.get('node.datasource.redis.host')}:${config.get('node.datasource.redis.port')}`);
+    });
+
     mongoose.connection.on("connected", function () {
-        console.log(`${strings.DATABASE_CONNECTED} ${config.get('node.datasource.host')}:${config.get('node.datasource.port')}`);
+        console.log(`${strings.MONGO_DATABASE_CONNECTED} ${config.get('node.datasource.host')}:${config.get('node.datasource.port')}`);
     });
     mongoose.connection.on("error", function (error) {
-        console.log(`${strings.DATABASE_CONNECTION_ERROR} ${config.get('node.datasource.port')}:${config.port} - ${error}`);
+        console.log(`${strings.MONGO_DATABASE_CONNECTION_ERROR} ${config.get('node.datasource.port')}:${config.port} - ${error}`);
     });
     mongoose.connection.on("disconnected", function () {
-        console.log(`${strings.DATABASE_DISCONNECTED} ${config.get('node.datasource.host')}:${config.get('node.datasource.port')}`);
+        console.log(`${strings.MONGO_DATABASE_DISCONNECTED} ${config.get('node.datasource.host')}:${config.get('node.datasource.port')}`);
     });
 
     const database = {};
     database.mongoose = mongoose;
+    database.redis = redisClient;
 
     if (config.get('node.mongoose.create-drop')) mongoose.connection.dropDatabase(config.get('node.datasource.database'));
 

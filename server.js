@@ -29,6 +29,8 @@ client.load({
     require("./app/component/eureka.component")(app, config);
     require("./app/component/zipkin.component")(app, config);
 
+    require("./app/component/resilient.component");
+
     require("./app/routes/auth.routes")(app, config);
 
     require("./app/routes/shipments.routes")(app);

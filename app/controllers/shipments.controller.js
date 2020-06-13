@@ -1,8 +1,10 @@
 const {validationResult, check} = require('express-validator/check');
+const crypto = require('crypto-js');
 
 const strings = require('../../resources/strings');
 const database = require("../models");
 
+const Accounts = require('../component/resilient.component');
 const Shipments = database.shipments;
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -284,9 +286,8 @@ exports.get = {
             if (data) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    return res.status(200).json(data, [
-                        {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                        {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}]);
+                    req.shipments = data;
+                    next();
                 });
             } else {
                 session.abortTransaction().then(() => {
@@ -306,6 +307,42 @@ exports.get = {
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
+        });
+    },
+    fetchDataFromService: (req, res, next) => {
+        console.log();
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const cacheId = crypto.MD5(`accounts-${req.shipments.courierId}`).toString();
+        proxy.post('/accounts/join/accountId',{data:[req.shipments.courierId]}).then( reponse => {
+            if (reponse.status < 300) {
+                database.redis.setex(cacheId, 3600, JSON.stringify(reponse.data));
+                const {userName, email} = reponse.data.pop();
+                return res.status(200).json({...req.shipments._doc, accounts: {userName, email}}, [
+                    {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
+                    {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}]);
+            } else {
+                return new Error('failed')
+            }
+        }).catch(err => {
+            req.cacheId = cacheId;
+            next();
+        });
+    },
+    fetchDataFromCache: (req, res, next) => {
+        database.redis.get(req.cacheId, (err, data) => {
+            if (!data) {
+                return res.status(500).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SHIPMENT_NOT_FOUND,
+                    error: true,
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            } else {
+                const {userName, email} = JSON.parse(data).pop();
+                return res.status(200).json({...req.shipments._doc, accounts: {userName, email}}, [
+                    {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
+                    {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}]);
+            }
         });
     }
 };

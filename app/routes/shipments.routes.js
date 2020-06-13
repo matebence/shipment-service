@@ -8,7 +8,7 @@ module.exports = app => {
 
     router.put("/:id", shipments.update.authorize, shipments.update.checkBody, shipments.update.validate, shipments.update.inDatabase);
 
-    router.get("/:id", shipments.get.authorize, shipments.get.validate, shipments.get.inDatabase);
+    router.get("/:id", shipments.get.authorize, shipments.get.validate, shipments.get.inDatabase, shipments.get.fetchDataFromService, shipments.get.fetchDataFromCache);
 
     router.get("/page/:pageNumber/limit/:pageSize", shipments.getAll.authorize, shipments.getAll.validate, shipments.getAll.inDatabase);
 
