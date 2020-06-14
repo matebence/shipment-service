@@ -10,9 +10,9 @@ module.exports = app => {
 
     router.get("/:id", shipments.get.authorize, shipments.get.validate, shipments.get.inDatabase, shipments.get.fetchDataFromService, shipments.get.fetchDataFromCache);
 
-    router.get("/page/:pageNumber/limit/:pageSize", shipments.getAll.authorize, shipments.getAll.validate, shipments.getAll.inDatabase);
+    router.get("/page/:pageNumber/limit/:pageSize", shipments.getAll.authorize, shipments.getAll.validate, shipments.getAll.inDatabase, shipments.getAll.fetchDataFromService, shipments.getAll.fetchDataFromCache);
 
-    router.post("/search", shipments.search.authorize, shipments.search.checkBody, shipments.search.inDatabase);
+    router.post("/search", shipments.search.authorize, shipments.search.checkBody, shipments.search.inDatabase, shipments.search.fetchDataFromService, shipments.search.fetchDataFromCache);
 
     app.use('/api/shipments', router);
 };

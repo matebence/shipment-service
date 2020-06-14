@@ -9,6 +9,7 @@ module.exports = {
     DATABASE_SEED: `Databáza bola úspešne naplnená údajmi`,
     DATABASE_SEED_ERR: `Databázu sa nepodarilo naplniť údajmi`,
     AUTH_REQUIRED: `Ľutujeme, ale stránka nie je k dispozícií`,
+    PROXY_ERR: `Služba je nedostupná`,
     AUTH_ERR: `Prístup odmietnutý`,
 
     CREATE_STATUS_ERR: `Vytvorenie nového státusu zásielky sa nepodarilo`,

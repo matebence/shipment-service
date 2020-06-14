@@ -27,7 +27,7 @@
   ],
   "shipments": [
     {
-      "courierId": 5,
+      "courier": 5,
       "parcelId": 1,
       "from": "Nesvady",
       "to": "Nitra",

@@ -1,4 +1,4 @@
-module.exports = (mongoose, schema, model) => {
+module.exports = (mongoose, schema, model, config) => {
     const mongooseDelete = require('mongoose-delete');
     const statusSchema = new schema(
         {

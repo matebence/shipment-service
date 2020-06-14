@@ -12,7 +12,7 @@ const DEFAULT_PAGE_NUMBER = 1;
 
 exports.create = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -34,7 +34,7 @@ exports.create = {
         next();
     },
     validate: [
-        check('courierId')
+        check('courier')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
         check('parcelId')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
@@ -99,7 +99,7 @@ exports.create = {
 
 exports.delete = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -128,7 +128,10 @@ exports.delete = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.delete({_id: database.mongoose.Types.ObjectId(req.params.id), deleted: false})]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.delete({
+            _id: database.mongoose.Types.ObjectId(req.params.id),
+            deleted: false
+        })]).then(([session, data]) => {
             session.startTransaction();
             if (data.n === 1) {
                 session.commitTransaction().then(() => {
@@ -159,7 +162,7 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -183,7 +186,7 @@ exports.update = {
     validate: [
         check('id')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
-        check('courierId')
+        check('courier')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
         check('parcelId')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
@@ -252,7 +255,7 @@ exports.update = {
 
 exports.get = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -281,12 +284,14 @@ exports.get = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false }).populate({path:"status", model:"status"})]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false}).populate({path: "status", model: "status"})]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
                     session.endSession();
                     req.shipments = data;
+                    req.hateosLinks = [{rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
+                        {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}];
                     next();
                 });
             } else {
@@ -310,26 +315,26 @@ exports.get = {
         });
     },
     fetchDataFromService: (req, res, next) => {
-        console.log();
         const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
-        const cacheId = crypto.MD5(`accounts-${req.shipments.courierId}`).toString();
-        proxy.post('/accounts/join/accountId',{data:[req.shipments.courierId]}).then( reponse => {
-            if (reponse.status < 300) {
-                database.redis.setex(cacheId, 3600, JSON.stringify(reponse.data));
-                const {userName, email} = reponse.data.pop();
-                return res.status(200).json({...req.shipments._doc, accounts: {userName, email}}, [
-                    {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                    {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}]);
-            } else {
-                return new Error('failed')
-            }
+        const accounts = req.shipments.courier;
+
+        proxy.post('/accounts/join/accountId', {data: [req.shipments.courier]}).then(response => {
+            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            database.redis.setex(crypto.MD5(`accounts-${accounts}`).toString(), 3600, JSON.stringify(response.data));
+
+            const shipments = [req.shipments].map(e => {
+                const {userName, email} = response.data.find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            }).pop();
+
+            return res.status(200).json(shipments, req.hateosLinks);
         }).catch(err => {
-            req.cacheId = cacheId;
+            req.cacheId = accounts;
             next();
         });
     },
     fetchDataFromCache: (req, res, next) => {
-        database.redis.get(req.cacheId, (err, data) => {
+        database.redis.get(crypto.MD5(`accounts-${req.cacheId}`).toString(), (err, data) => {
             if (!data) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
@@ -337,19 +342,21 @@ exports.get = {
                     error: true,
                     nav: `${req.protocol}://${req.get('host')}`
                 });
-            } else {
-                const {userName, email} = JSON.parse(data).pop();
-                return res.status(200).json({...req.shipments._doc, accounts: {userName, email}}, [
-                    {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                    {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}]);
             }
+
+            const shipments = [req.shipments].map(e => {
+                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            }).pop();
+
+            return res.status(200).json(shipments, req.hateosLinks);
         });
     }
 };
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -380,14 +387,15 @@ exports.getAll = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path:"status", model:"status"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path: "status", model: "status"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    return res.status(206).json({data}, [
-                        {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                        {rel: "next-range", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${1 + Number(req.params.pageNumber)}/limit/${req.params.pageSize}`}]);
+                    req.shipments = data;
+                    req.hateosLinks = [{rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
+                        {rel: "next-range", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${1 + Number(req.params.pageNumber)}/limit/${req.params.pageSize}`}];
+                    next();
                 });
             } else {
                 session.abortTransaction().then(() => {
@@ -408,12 +416,51 @@ exports.getAll = {
                 nav: `${req.protocol}://${req.get('host')}`
             });
         });
+    },
+    fetchDataFromService: (req, res, next) => {
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
+
+        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
+            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
+
+            const shipments = req.shipments.map(e => {
+                const {userName, email} = response.data.find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            });
+
+            return res.status(206).json({data: shipments}, req.hateosLinks);
+        }).catch(err => {
+            req.cacheId = accounts;
+            next();
+        });
+    },
+    fetchDataFromCache: (req, res, next) => {
+        database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
+            if (!data) {
+                return res.status(500).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SHIPMENT_NOT_FOUND,
+                    error: true,
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+
+            data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
+            const shipments = req.shipments.map(e => {
+                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            });
+
+            return res.status(206).json({data: shipments}, req.hateosLinks);
+        });
     }
 };
 
 exports.search = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -460,12 +507,14 @@ exports.search = {
             if ((Number(pagination.pageNumber) * Number(pagination.pageSize)) < count) hateosLinks.push({rel: "has-next", method: "POST", href: `${req.protocol}://${req.get('host')}/api/shipments/search`});
         });
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path:"status", model:"status"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path: "status", model: "status"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    return res.status(200).json({data}, hateosLinks);
+                    req.shipments = data;
+                    req.hateosLinks = hateosLinks;
+                    next();
                 });
             } else {
                 session.abortTransaction().then(() => {
@@ -485,6 +534,45 @@ exports.search = {
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
+        });
+    },
+    fetchDataFromService: (req, res, next) => {
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
+
+        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
+            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
+
+            const shipments = req.shipments.map(e => {
+                const {userName, email} = response.data.find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            });
+
+            return res.status(200).json({data: shipments}, req.hateosLinks);
+        }).catch(err => {
+            req.cacheId = accounts;
+            next();
+        });
+    },
+    fetchDataFromCache: (req, res, next) => {
+        database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
+            if (!data) {
+                return res.status(500).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SHIPMENT_NOT_FOUND,
+                    error: true,
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+
+            data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
+            const shipments = req.shipments.map(e => {
+                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+            });
+
+            return res.status(200).json({data: shipments}, req.hateosLinks);
         });
     }
 };
