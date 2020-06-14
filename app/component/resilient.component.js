@@ -10,7 +10,7 @@ module.exports = (app, config, callback) => {
                 retry: config.get('node.resilient.retry'),
                 waitBeforeRetry: config.get('node.resilient.waitBeforeRetry'),
                 timeout: config.get('node.resilient.timeout'),
-                servers: client.getInstancesByAppId(service).map((e) => {return e.homePageUrl;}),
+                servers: client.getInstancesByAppId(service).map((e) => {return `http://${e.vipAddress}:${e.port.$}`;}),
                 headers: {Authorization: token}
             },
             balancer: {
