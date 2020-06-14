@@ -319,7 +319,7 @@ exports.get = {
         const accounts = req.shipments.courier;
 
         proxy.post('/accounts/join/accountId', {data: [req.shipments.courier]}).then(response => {
-            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             database.redis.setex(crypto.MD5(`accounts-${accounts}`).toString(), 3600, JSON.stringify(response.data));
 
             const shipments = [req.shipments].map(e => {
@@ -335,7 +335,7 @@ exports.get = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.get(crypto.MD5(`accounts-${req.cacheId}`).toString(), (err, data) => {
-            if (!data) {
+            if (!JSON.parse(data)) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
@@ -422,7 +422,7 @@ exports.getAll = {
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
         proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
-            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
 
             const shipments = req.shipments.map(e => {
@@ -438,7 +438,7 @@ exports.getAll = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!data) {
+            if (!JSON.parse(data)) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
@@ -541,7 +541,7 @@ exports.search = {
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
         proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
-            if (response.status >= 300) return new Error(strings.PROXY_ERR);
+            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
 
             const shipments = req.shipments.map(e => {
@@ -557,7 +557,7 @@ exports.search = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!data) {
+            if (!JSON.parse(data)) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
