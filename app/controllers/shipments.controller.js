@@ -12,7 +12,7 @@ const DEFAULT_PAGE_NUMBER = 1;
 
 exports.create = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -99,7 +99,7 @@ exports.create = {
 
 exports.delete = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -162,7 +162,7 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -255,7 +255,7 @@ exports.update = {
 
 exports.get = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -335,28 +335,37 @@ exports.get = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.get(crypto.MD5(`accounts-${req.cacheId}`).toString(), (err, data) => {
-            if (!JSON.parse(data)) {
+            if (!data) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
                     error: true,
                     nav: `${req.protocol}://${req.get('host')}`
                 });
+            } else{
+                try{
+                    const shipments = [req.shipments].map(e => {
+                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+                    }).pop();
+
+                    return res.status(200).json(shipments, req.hateosLinks);
+                }catch (err){
+                    return res.status(500).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.SHIPMENT_NOT_FOUND,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
+                }
             }
-
-            const shipments = [req.shipments].map(e => {
-                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-            }).pop();
-
-            return res.status(200).json(shipments, req.hateosLinks);
         });
     }
 };
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -438,29 +447,38 @@ exports.getAll = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!JSON.parse(data)) {
+            if (!data) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
                     error: true,
                     nav: `${req.protocol}://${req.get('host')}`
                 });
+            } else {
+                try{
+                    data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
+                    const shipments = req.shipments.map(e => {
+                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+                    });
+
+                    return res.status(206).json({data: shipments}, req.hateosLinks);
+                } catch(err) {
+                    return res.status(500).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.SHIPMENT_NOT_FOUND,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
+                }
             }
-
-            data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
-            const shipments = req.shipments.map(e => {
-                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-            });
-
-            return res.status(206).json({data: shipments}, req.hateosLinks);
         });
     }
 };
 
 exports.search = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -557,22 +575,109 @@ exports.search = {
     },
     fetchDataFromCache: (req, res, next) => {
         database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!JSON.parse(data)) {
+            if (!data) {
                 return res.status(500).json({
                     timestamp: new Date().toISOString(),
                     message: strings.SHIPMENT_NOT_FOUND,
                     error: true,
                     nav: `${req.protocol}://${req.get('host')}`
                 });
+            } else {
+                try {
+                    data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
+                    const shipments = req.shipments.map(e => {
+                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
+                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+                    });
+
+                    return res.status(200).json({data: shipments}, req.hateosLinks);
+                } catch (err){
+                    return res.status(500).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.SHIPMENT_NOT_FOUND,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
+                }
             }
+        });
+    }
+};
 
-            data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
-            const shipments = req.shipments.map(e => {
-                const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
+exports.join = {
+    authorize: (req, res, next) => {
+        if (!req.hasRole(['ROLE_SYSTEM'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
             });
+        }
+        next()
+    },
+    checkBody: (req, res, next) => {
+        if (Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                timestamp: new Date().toISOString(),
+                message: strings.SERVER_REQUEST_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
+    },
+    validate: [
+        check('columnName')
+            .matches(/^_|[a-zA-Z]+$/).withMessage(strings.SHIPMENT_COLUMN_NAME_MATCHES),
 
-            return res.status(200).json({data: shipments}, req.hateosLinks);
+        (req, res, next) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SERVER_VALIDATION_ERR,
+                    error: true,
+                    validations: errors.array(),
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+            next()
+        }
+    ],
+    inDatabase: (req, res, next) => {
+        let ids = {[`${req.params.columnName}`]: {$in: []}};
+        if (req.body) {
+            for (const element of req.body) {
+                ids[`${req.params.columnName}`].$in.push(database.mongoose.Types.ObjectId(element));
+            }
+        }
+
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...ids}).populate({path: "status", model: "status"})]).then(([session, data]) => {
+            session.startTransaction();
+            if (data.length > 0 || data !== undefined) {
+                session.commitTransaction().then(() => {
+                    session.endSession();
+                    return res.status(200).json(data);
+                });
+            } else {
+                session.abortTransaction().then(() => {
+                    session.endSession();
+                    return res.status(400).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.SHIPMENT_NOT_FOUND,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
+                });
+            }
+        }).catch(err => {
+            return res.status(500).json({
+                timestamp: new Date().toISOString(),
+                message: strings.SHIPMENT_NOT_FOUND,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
         });
     }
 };

@@ -14,5 +14,7 @@ module.exports = app => {
 
     router.post("/search", shipments.search.authorize, shipments.search.checkBody, shipments.search.inDatabase, shipments.search.fetchDataFromService, shipments.search.fetchDataFromCache);
 
+    router.post("/join/:columnName", shipments.join.authorize, shipments.join.checkBody, shipments.join.validate, shipments.join.inDatabase);
+
     app.use('/api/shipments', router);
 };

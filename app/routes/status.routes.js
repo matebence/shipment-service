@@ -14,5 +14,7 @@ module.exports = app => {
 
     router.post("/search", status.search.authorize, status.search.checkBody, status.search.inDatabase);
 
+    router.post("/join/:columnName", status.join.authorize, status.join.checkBody, status.join.validate, status.join.inDatabase);
+
     app.use('/api/status', router);
 };

@@ -29,6 +29,7 @@ module.exports = {
     STATUS_MONGO_ID: `Nesprávný formát identifikacného čísla`,
     STATUS_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
     STATUS_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`,
+    STATUS_COLUMN_NAME_MATCHES: `Nesprávný formát názov stľpca`,
     STATUS_UNIQUE: `Státus zásielky už existuje`,
 
     SHIPMENT_COURIER_ID_INT: `Nesprávný formát identifikacného čísla kuriéra`,
@@ -43,5 +44,6 @@ module.exports = {
     SHIPMENT_DATE: `Nesprávný formát dátumu`,
     SHIPMENT_MONGO_ID: `Nesprávný formát identifikacného čísla`,
     SHIPMENT_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
+    SHIPMENT_COLUMN_NAME_MATCHES: `Nesprávný formát názov stľpca`,
     SHIPMENT_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`
 };

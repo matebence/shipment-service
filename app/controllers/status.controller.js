@@ -10,7 +10,7 @@ const DEFAULT_PAGE_NUMBER = 1;
 
 exports.create = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -83,7 +83,7 @@ exports.create = {
 
 exports.delete = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -143,7 +143,7 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -222,7 +222,7 @@ exports.update = {
 
 exports.get = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -284,7 +284,7 @@ exports.get = {
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -348,7 +348,7 @@ exports.getAll = {
 
 exports.search = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -401,6 +401,84 @@ exports.search = {
                 session.commitTransaction().then(() => {
                     session.endSession();
                     return res.status(200).json({data}, hateosLinks);
+                });
+            } else {
+                session.abortTransaction().then(() => {
+                    session.endSession();
+                    return res.status(400).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.STATUS_NOT_FOUND,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
+                });
+            }
+        }).catch(err => {
+            return res.status(500).json({
+                timestamp: new Date().toISOString(),
+                message: strings.STATUS_NOT_FOUND,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        });
+    }
+};
+
+exports.join = {
+    authorize: (req, res, next) => {
+        if (!req.hasRole(['ROLE_SYSTEM'])) {
+            return res.status(401).json({
+                timestamp: new Date().toISOString(),
+                message: strings.AUTH_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
+    },
+    checkBody: (req, res, next) => {
+        if (Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                timestamp: new Date().toISOString(),
+                message: strings.SERVER_REQUEST_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        }
+        next()
+    },
+    validate: [
+        check('columnName')
+            .matches(/^_|[a-zA-Z]+$/).withMessage(strings.STATUS_COLUMN_NAME_MATCHES),
+
+        (req, res, next) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.SERVER_VALIDATION_ERR,
+                    error: true,
+                    validations: errors.array(),
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+            next()
+        }
+    ],
+    inDatabase: (req, res, next) => {
+        let ids = {[`${req.params.columnName}`]: {$in: []}};
+        if (req.body) {
+            for (const element of req.body) {
+                ids[`${req.params.columnName}`].$in.push(database.mongoose.Types.ObjectId(element));
+            }
+        }
+
+        return Promise.all([Status.startSession(), Status.find({deleted: false, ...ids})]).then(([session, data]) => {
+            session.startTransaction();
+            if (data.length > 0 || data !== undefined) {
+                session.commitTransaction().then(() => {
+                    session.endSession();
+                    return res.status(200).json(data);
                 });
             } else {
                 session.abortTransaction().then(() => {
