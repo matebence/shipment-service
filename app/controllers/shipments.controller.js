@@ -649,7 +649,7 @@ exports.join = {
         let ids = {[`${req.params.columnName}`]: {$in: []}};
         if (req.body) {
             for (const element of req.body) {
-                ids[`${req.params.columnName}`].$in.push(database.mongoose.Types.ObjectId(element));
+                req.params.columnName === "_id"?ids[`${req.params.columnName}`].$in.push(database.mongoose.Types.ObjectId(element)):ids[`${req.params.columnName}`].$in.push(element)
             }
         }
 
