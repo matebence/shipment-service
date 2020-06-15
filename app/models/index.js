@@ -42,8 +42,8 @@ module.exports = (app, config) => {
 
     if (config.get('node.mongoose.create-drop')) mongoose.connection.dropDatabase(config.get('node.datasource.database'));
 
-    database.status = require("./status.mode")(mongoose, mongoose.Schema, mongoose.model, config);
-    database.shipments = require("./shipments.model")(mongoose, mongoose.Schema, mongoose.model, config);
+    database.status = require("./status.mode")(mongoose, mongoose.Schema, mongoose.model);
+    database.shipments = require("./shipments.model")(mongoose, mongoose.Schema, mongoose.model);
 
     database.status.insertMany(data.status, (err, result) => {
         database.shipments.insertMany(data.shipments, (err, result) => {

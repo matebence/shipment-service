@@ -1,4 +1,4 @@
-module.exports = (mongoose, schema, model, config) => {
+module.exports = (mongoose, schema, model) => {
     const Accounts = require('../component/resilient.component');
     const mailer = require('../component/nodemailer.component');
     const mongooseDelete = require('mongoose-delete');
@@ -54,7 +54,7 @@ module.exports = (mongoose, schema, model, config) => {
     shipmentSchema.post('findOneAndUpdate', async function () {
         postShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
         if (preShipment.status._id.equals(postShipment.status._id)) return;
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE", `Bearer ${config.get('blesk.server-key')}`);
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         proxy.post('/accounts/join/accountId', {data: [postShipment.courier]}).then(response => {
             if (response.status < 300) mailer.sendHTMLMaile("./resources/templates/shipmentNotification.ejs", {shipmentStatus: postShipment.status.name}, {to: response.data.pop().email, subject: 'Zmena stavu zásielky'});
         })

@@ -315,7 +315,7 @@ exports.get = {
         });
     },
     fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.courier;
 
         proxy.post('/accounts/join/accountId', {data: [req.shipments.courier]}).then(response => {
@@ -350,7 +350,7 @@ exports.get = {
                     }).pop();
 
                     return res.status(200).json(shipments, req.hateosLinks);
-                }catch (err){
+                }catch(err){
                     return res.status(500).json({
                         timestamp: new Date().toISOString(),
                         message: strings.SHIPMENT_NOT_FOUND,
@@ -427,7 +427,7 @@ exports.getAll = {
         });
     },
     fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
         proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
@@ -555,7 +555,7 @@ exports.search = {
         });
     },
     fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE", req.headers.authorization);
+        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
         proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
@@ -591,7 +591,7 @@ exports.search = {
                     });
 
                     return res.status(200).json({data: shipments}, req.hateosLinks);
-                } catch (err){
+                } catch(err){
                     return res.status(500).json({
                         timestamp: new Date().toISOString(),
                         message: strings.SHIPMENT_NOT_FOUND,
