@@ -54,9 +54,9 @@ module.exports = (mongoose, schema, model) => {
     shipmentSchema.post('findOneAndUpdate', async function () {
         postShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
         if (preShipment.status._id.equals(postShipment.status._id)) return;
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
-        proxy.post('/accounts/join/accountId', {data: [postShipment.courier]}).then(response => {
-            if (response.status < 300) mailer.sendHTMLMaile("./resources/templates/shipmentNotification.ejs", {shipmentStatus: postShipment.status.name}, {to: response.data.pop().email, subject: 'Zmena stavu zásielky'});
+        const proxy = Accounts.resilient("PARCEL-SERVICE");
+        proxy.post('/parcels/join/id', {data: [postShipment.parcelId]}).then(response => {
+            if (response.status < 300) mailer.sendHTMLMaile("./resources/templates/shipmentNotification.ejs", {shipmentStatus: postShipment.status.name}, {to: response.data.pop().sender.email, subject: 'Zmena stavu zásielky'});
         })
     });
 

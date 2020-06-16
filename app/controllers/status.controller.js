@@ -386,7 +386,11 @@ exports.search = {
         }
         if (search) {
             Object.keys(search).map(function (key, index) {
-                search[key] = {$regex: new RegExp("^.*" + search[key] + '.*', "i")}
+                if(isNaN(search[key]) &&  new RegExp("^[0-9a-fA-F]{24}$").test(search[key])){
+                    search[key] = database.mongoose.Types.ObjectId(search[key])
+                } else if (isNaN(search[key])){
+                    search[key] = {$regex: new RegExp("^.*" + search[key] + '.*', "i")}
+                }
             });
         }
         Status.countDocuments({deleted: false, ...search}, (err, count) => {

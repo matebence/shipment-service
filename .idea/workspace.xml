@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="896d13bd-775f-4fb8-9bad-38b5542f22d2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Dockerfile" afterPath="$PROJECT_DIR$/Dockerfile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/shipments.controller.js" afterPath="$PROJECT_DIR$/app/controllers/shipments.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/status.controller.js" afterPath="$PROJECT_DIR$/app/controllers/status.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/shipments.model.js" afterPath="$PROJECT_DIR$/app/models/shipments.model.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -27,8 +30,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>redistest</find>
-      <find>strings</find>
       <find>.get</find>
       <find>Bea</find>
       <find>Acc</find>
@@ -57,6 +58,8 @@
       <find>exports.get</find>
       <find>'error'</find>
       <find>catch</find>
+      <find>[req</find>
+      <find>.search</find>
     </findStrings>
     <replaceStrings>
       <replace>STATUS_</replace>
@@ -89,13 +92,13 @@
         <option value="$PROJECT_DIR$/app/routes/status.routes.js" />
         <option value="$PROJECT_DIR$/app/routes/shipments.routes.js" />
         <option value="$PROJECT_DIR$/resources/strings.js" />
-        <option value="$PROJECT_DIR$/app/controllers/status.controller.js" />
         <option value="$PROJECT_DIR$/app/models/index.js" />
-        <option value="$PROJECT_DIR$/app/models/shipments.model.js" />
         <option value="$PROJECT_DIR$/app/models/status.mode.js" />
         <option value="$PROJECT_DIR$/app/component/resilient.component.js" />
-        <option value="$PROJECT_DIR$/app/controllers/shipments.controller.js" />
         <option value="$PROJECT_DIR$/Dockerfile" />
+        <option value="$PROJECT_DIR$/app/controllers/shipments.controller.js" />
+        <option value="$PROJECT_DIR$/app/controllers/status.controller.js" />
+        <option value="$PROJECT_DIR$/app/models/shipments.model.js" />
       </list>
     </option>
   </component>
@@ -136,6 +139,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -176,25 +180,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="component" />
+              <option name="myItemId" value="controllers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="nodejs_interpreter_path" value="D:/Program Files/NodeJS/node" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../place-service" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../warehouse-service" />
     <property name="settings.editor.selected.configurable" value="settings.nodejs" />
     <property name="JavaScriptPreferStrict" value="false" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="javascript.nodejs.core.library.configured.version" value="10.15.0" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-    <property name="SearchEverywhereHistoryKey" value="control&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;routes&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/routes/shipments.routes.js&#10;sh&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;index.&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;res&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/component/resilient.component.js&#10;index&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;.model&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;strings.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/resources/strings.js&#10;server.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/server.js" />
+    <property name="SearchEverywhereHistoryKey" value="ship&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;sh&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;control&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;routes&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/routes/shipments.routes.js&#10;index.&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;res&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/component/resilient.component.js&#10;index&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;.model&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;strings.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/resources/strings.js&#10;server.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/server.js" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
@@ -349,12 +352,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102483000" />
+    <option name="totallyTimeSpent" value="107178000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1929" y="-9" width="1938" height="1098" extended-state="6" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1859375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18541667" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32398754" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -364,12 +367,21 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997923" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32398754" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1859375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997923" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -656,13 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/status.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="601">
-          <caret line="472" column="0" lean-forward="false" selection-start-line="472" selection-start-column="0" selection-end-line="472" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
@@ -712,13 +717,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/shipments.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="771">
-          <caret line="63" column="2" lean-forward="true" selection-start-line="63" selection-start-column="2" selection-end-line="63" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/models/status.mode.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
@@ -726,18 +724,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/shipments.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16368">
-          <caret line="682" column="2" lean-forward="true" selection-start-line="682" selection-start-column="2" selection-end-line="682" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="5" column="23" lean-forward="true" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/status.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="369">
+          <caret line="394" column="9" lean-forward="false" selection-start-line="394" selection-start-column="9" selection-end-line="394" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/shipments.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="516" column="0" lean-forward="false" selection-start-line="516" selection-start-column="0" selection-end-line="524" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/shipments.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="771">
+          <caret line="63" column="2" lean-forward="true" selection-start-line="63" selection-start-column="2" selection-end-line="63" selection-end-column="2" />
           <folding />
         </state>
       </provider>
