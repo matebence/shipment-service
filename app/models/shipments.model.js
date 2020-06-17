@@ -34,10 +34,6 @@ module.exports = (mongoose, schema, model) => {
                 type: Boolean,
                 required: true
             },
-            confirmed: {
-                type: Boolean,
-                required: true
-            },
             startDate: {
                 type: String,
             },

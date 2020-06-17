@@ -50,8 +50,6 @@ exports.create = {
             .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
         check('express')
             .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
-        check('confirmed')
-            .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
         check('startDate')
             .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
         check('endDate')
@@ -202,8 +200,6 @@ exports.update = {
             .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
         check('express')
             .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
-        check('confirmed')
-            .isBoolean().withMessage(strings.SHIPMENT_CONFIRMED_BOOLEAN),
         check('startDate')
             .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
         check('endDate')

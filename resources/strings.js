@@ -40,7 +40,6 @@ module.exports = {
     SHIPMENT_FROM_ASCII: `Nesprávný formát názvu miesta`,
     SHIPMENT_PRICE_FLOAT: `Nesprávný formát ceny zásielky`,
     SHIPMENT_EXPRESS_BOOLEAN: `Nesprávný formát hodnoty express dodania`,
-    SHIPMENT_CONFIRMED_BOOLEAN: `Nesprávný formát hodnoty potvrdenia`,
     SHIPMENT_DATE: `Nesprávný formát dátumu`,
     SHIPMENT_MONGO_ID: `Nesprávný formát identifikacného čísla`,
     SHIPMENT_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
