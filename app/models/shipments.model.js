@@ -26,6 +26,11 @@ module.exports = (mongoose, schema, model) => {
                 ref: "status",
                 required: true
             },
+            invoice: {
+                type: schema.Types.ObjectId,
+                ref: "invoices",
+                required: true
+            },
             price: {
                 type: Number,
                 required: true
@@ -44,9 +49,17 @@ module.exports = (mongoose, schema, model) => {
         {collection: "shipments", timestamps: {createdAt: 'createdAt'}}
     ).plugin(mongooseDelete, {deletedAt: true});
 
+    shipmentSchema.pre('insertMany', async function (next, docs) {
+        // const proxy = Accounts.resilient("PARCEL-SERVICE");
+        // proxy.post('/parcels/join/id', {data: [docs.pop().parcelId]}).then(response => {
+        //     console.log(response.data);
+        // })
+    });
+
     shipmentSchema.pre('findOneAndUpdate', async function () {
         preShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
     });
+
     shipmentSchema.post('findOneAndUpdate', async function () {
         postShipment = await this.model.findOne(this.getQuery()).populate({path:"status", model:"status"});
         if (preShipment.status._id.equals(postShipment.status._id)) return;

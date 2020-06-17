@@ -10,7 +10,8 @@ module.exports = (app, config, callback) => {
                 retry: config.get('node.resilient.retry'),
                 waitBeforeRetry: config.get('node.resilient.waitBeforeRetry'),
                 timeout: config.get('node.resilient.timeout'),
-                servers: client.getInstancesByAppId(service).map((e) => {return `http://${e.vipAddress}:${e.port.$}`;}),
+                // servers: client.getInstancesByAppId(service).map((e) => {return `http://${e.vipAddress}:${e.port.$}`;}),
+                servers: ['http://192.168.99.100:5800', 'http://192.168.99.100:7000'],
                 headers: {Authorization: `Bearer ${config.get('blesk.server-key')}`}
             },
             balancer: {

@@ -25,6 +25,12 @@
       "name": "Doručená"
     }
   ],
+  "invoices": [
+    {
+      "_id": "5edf8982ca0d9d132cd3b8f3",
+      "invoice": "parcel-4-1-1591868749.pdf"
+    }
+  ],
   "shipments": [
     {
       "courier": 4,
@@ -32,6 +38,7 @@
       "from": "Nesvady",
       "to": "Nitra",
       "status": "5edf8982ca0d9d132cd3b8df",
+      "invoice": "5edf8982ca0d9d132cd3b8f3",
       "price": 8.50,
       "express": false,
       "startDate": "2020-06-09T13:15:15.628Z",

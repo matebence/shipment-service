@@ -18,11 +18,11 @@ module.exports = {
     GET_STATUS_ERR: `Ľutujeme ale státus zásielky s identifikačním číslom neexistuje`,
     STATUS_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadný státus zásielky`,
 
-    CREATE_SHIPMENT_ERR: `Vytvorenie nového státusu balíka sa nepodarilo`,
-    UPDATE_SHIPMENT_ERR: `Aktualizácia státusu balíka sa nepodarilo`,
-    DELETE_SHIPMENT_ERR: `Odstránenie státusu balíka sa nepodarilo`,
-    GET_SHIPMENT_ERR: `Ľutujeme ale státus balíka s identifikačním číslom neexistuje`,
-    SHIPMENT_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadný balík s státusom`,
+    CREATE_SHIPMENT_ERR: `Vytvorenie zásielky sa nepodarilo`,
+    UPDATE_SHIPMENT_ERR: `Aktualizácia zásielky sa nepodarilo`,
+    DELETE_SHIPMENT_ERR: `Odstránenie zásielky sa nepodarilo`,
+    GET_SHIPMENT_ERR: `Ľutujeme ale zásielka s identifikačním číslom neexistuje`,
+    SHIPMENT_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadná zásielka`,
 
     STATUS_NAME_LENGHT: `Minimálna dlžka státusu zásielky je 3 a maximalná je 64`,
     STATUS_NAME_ASCII: `Nesprávný formát státusu zásielky`,

@@ -3,7 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="896d13bd-775f-4fb8-9bad-38b5542f22d2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/component/resilient.component.js" afterPath="$PROJECT_DIR$/app/component/resilient.component.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/shipments.controller.js" afterPath="$PROJECT_DIR$/app/controllers/shipments.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/index.js" afterPath="$PROJECT_DIR$/app/models/index.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/shipments.model.js" afterPath="$PROJECT_DIR$/app/models/shipments.model.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/data.json" afterPath="$PROJECT_DIR$/resources/data.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/strings.js" afterPath="$PROJECT_DIR$/resources/strings.js" />
@@ -20,7 +22,28 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="shipments.model.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/models/shipments.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="459">
+              <caret line="59" column="105" lean-forward="true" selection-start-line="59" selection-start-column="105" selection-end-line="59" selection-end-column="105" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="resilient.component.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/component/resilient.component.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="384">
+              <caret line="16" column="23" lean-forward="true" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -31,17 +54,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Acc</find>
-      <find>Acco</find>
-      <find>op</find>
-      <find>resi</find>
-      <find>ahoj</find>
-      <find>accounts</find>
-      <find>path</find>
-      <find>data</find>
-      <find>courierId</find>
       <find>reponse</find>
-      <find>console</find>
       <find>'ROLE_SYSTEM',</find>
       <find>hostName</find>
       <find>if (!data) {</find>
@@ -61,6 +74,16 @@
       <find>.search</find>
       <find>confirm</find>
       <find>confirmed</find>
+      <find>inser</find>
+      <find>Vytvorenie nového státusu balíka sa nepodarilo</find>
+      <find>consolel</find>
+      <find>stat</find>
+      <find>statu</find>
+      <find>5edf8982ca0d9d132cd3b8f3</find>
+      <find>pop</find>
+      <find>populate</find>
+      <find>getAll</find>
+      <find>console</find>
     </findStrings>
     <replaceStrings>
       <replace>STATUS_</replace>
@@ -91,15 +114,16 @@
         <option value="$PROJECT_DIR$/package-lock.json" />
         <option value="$PROJECT_DIR$/app/routes/status.routes.js" />
         <option value="$PROJECT_DIR$/app/routes/shipments.routes.js" />
-        <option value="$PROJECT_DIR$/app/models/index.js" />
         <option value="$PROJECT_DIR$/app/models/status.mode.js" />
-        <option value="$PROJECT_DIR$/app/component/resilient.component.js" />
         <option value="$PROJECT_DIR$/Dockerfile" />
         <option value="$PROJECT_DIR$/app/controllers/status.controller.js" />
-        <option value="$PROJECT_DIR$/resources/data.json" />
-        <option value="$PROJECT_DIR$/app/models/shipments.model.js" />
         <option value="$PROJECT_DIR$/resources/strings.js" />
+        <option value="$PROJECT_DIR$/app/models/invoices.model.js" />
+        <option value="$PROJECT_DIR$/resources/data.json" />
+        <option value="$PROJECT_DIR$/app/models/index.js" />
         <option value="$PROJECT_DIR$/app/controllers/shipments.controller.js" />
+        <option value="$PROJECT_DIR$/app/models/shipments.model.js" />
+        <option value="$PROJECT_DIR$/app/component/resilient.component.js" />
       </list>
     </option>
   </component>
@@ -162,6 +186,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="public" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="shipment-service" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="shipment-service" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -180,7 +218,7 @@
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="javascript.nodejs.core.library.configured.version" value="10.15.0" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-    <property name="SearchEverywhereHistoryKey" value="ship&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;sh&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;control&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;routes&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/routes/shipments.routes.js&#10;index.&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;res&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/component/resilient.component.js&#10;index&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;.model&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;strings.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/resources/strings.js&#10;server.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/server.js" />
+    <property name="SearchEverywhereHistoryKey" value="res&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/component/resilient.component.js&#10;index.&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;ship&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;sh&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;control&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/controllers/shipments.controller.js&#10;routes&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/routes/shipments.routes.js&#10;index&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/index.js&#10;.model&#9;FILE&#9;file://D:/Projects/app-blesk/shipment-service/app/models/shipments.model.js&#10;strings.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/resources/strings.js&#10;server.&#9;FILE&#9;file://D:/Projects/app-blesk/shipments-service/server.js" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
@@ -335,12 +373,13 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="110452000" />
+    <option name="totallyTimeSpent" value="114794000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1929" y="-9" width="1938" height="1098" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1859375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1859375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32398754" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -378,13 +417,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/server.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="25" column="27" lean-forward="false" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="438">
@@ -651,34 +683,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/routes/shipments.routes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="2" column="47" lean-forward="true" selection-start-line="2" selection-start-column="47" selection-end-line="2" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1272">
-          <caret line="53" column="30" lean-forward="true" selection-start-line="53" selection-start-column="30" selection-end-line="53" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/component/resilient.component.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="30" column="2" lean-forward="true" selection-start-line="30" selection-start-column="2" selection-end-line="30" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/status.mode.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -701,42 +705,82 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/status.mode.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="14" column="2" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="14" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/shipments.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="1" column="22" lean-forward="false" selection-start-line="1" selection-start-column="22" selection-end-line="1" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="18" column="30" lean-forward="false" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
+        <state relative-caret-position="285">
+          <caret line="32" column="48" lean-forward="false" selection-start-line="32" selection-start-column="48" selection-end-line="32" selection-end-column="48" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/data.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="755">
-          <caret line="40" column="1" lean-forward="true" selection-start-line="40" selection-start-column="1" selection-end-line="40" selection-end-column="1" />
+        <state relative-caret-position="168">
+          <caret line="7" column="40" lean-forward="true" selection-start-line="7" selection-start-column="40" selection-end-line="7" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="568">
+          <caret line="37" column="0" lean-forward="true" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/invoices.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/strings.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="669">
-          <caret line="42" column="0" lean-forward="false" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/shipments.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+        <state relative-caret-position="1128">
+          <caret line="47" column="2" lean-forward="true" selection-start-line="47" selection-start-column="2" selection-end-line="47" selection-end-column="2" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/shipments.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="841">
-          <caret line="208" column="15" lean-forward="false" selection-start-line="208" selection-start-column="15" selection-end-line="208" selection-end-column="15" />
+        <state relative-caret-position="2609">
+          <caret line="380" column="16" lean-forward="false" selection-start-line="380" selection-start-column="16" selection-end-line="380" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/component/resilient.component.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="16" column="23" lean-forward="true" selection-start-line="16" selection-start-column="23" selection-end-line="16" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/shipments.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="59" column="105" lean-forward="true" selection-start-line="59" selection-start-column="105" selection-end-line="59" selection-end-column="105" />
           <folding />
         </state>
       </provider>

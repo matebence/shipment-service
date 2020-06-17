@@ -34,25 +34,25 @@ exports.create = {
         next();
     },
     validate: [
-        check('courier')
+        check('shipments[*].courier')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
-        check('parcelId')
+        check('shipments[*].parcelId')
             .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
-        check('from')
+        check('shipments[*].from')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
             .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
-        check('to')
+        check('shipments[*].to')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
             .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
-        check('status')
+        check('shipments[*].status')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
-        check('price')
+        check('shipments[*].price')
             .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
-        check('express')
+        check('shipments[*].express')
             .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
-        check('startDate')
+        check('shipments[*].startDate')
             .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
-        check('endDate')
+        check('shipments[*].endDate')
             .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
 
         (req, res, next) => {
@@ -70,7 +70,7 @@ exports.create = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments(req.body).save()]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
@@ -280,7 +280,7 @@ exports.get = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false}).populate({path: "status", model: "status"})]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"})]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
@@ -392,7 +392,7 @@ exports.getAll = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path: "status", model: "status"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
@@ -525,7 +525,7 @@ exports.search = {
             if ((Number(pagination.pageNumber) * Number(pagination.pageSize)) < count) hateosLinks.push({rel: "has-next", method: "POST", href: `${req.protocol}://${req.get('host')}/api/shipments/search`});
         });
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path: "status", model: "status"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
@@ -653,7 +653,7 @@ exports.join = {
             }
         }
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...ids}).populate({path: "status", model: "status"})]).then(([session, data]) => {
+        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...ids}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"})]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
