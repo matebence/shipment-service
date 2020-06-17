@@ -23,7 +23,7 @@ client.load({
 }).then(config => {
     config.bootstrap = node;
 
-    const { createInvoice } = require("./app/component/pdfkit.component");
+    const { pdf } = require("./app/component/pdfkit.component");
 
     const invoice = {
         shipping: {
@@ -53,7 +53,8 @@ client.load({
         invoice_nr: 1234
     };
 
-    createInvoice(invoice, "invoice.pdf");
+    pdf.init(invoice, "invoice.pdf").addHeader().addCustomerDetails().createTable();
+
     require("./app/component/nodemailer.component")(app, config);
     require("./app/component/eureka.component")(app, config);
     require("./app/component/zipkin.component")(app, config);
