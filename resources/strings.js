@@ -18,6 +18,12 @@ module.exports = {
     GET_STATUS_ERR: `Ľutujeme ale státus zásielky s identifikačním číslom neexistuje`,
     STATUS_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadný státus zásielky`,
 
+    CREATE_INVOICE_ERR: `Vytvorenie faktúry sa nepodarilo, skúste znova`,
+    UPDATE_INVOICE_ERR: `Aktualizácia faktúry sa nepodarilo, skúste znova`,
+    DELETE_INVOICE_ERR: `Odstránenie faktúry sa nepodarilo, skúste znova`,
+    GET_INVOICE_ERR: `Ľutujeme ale faktúra s identifikačním číslom neexistuje`,
+    INVOICE_NOT_FOUND: `Ľutujeme ale nenašla sa žiadna fatúra`,
+
     CREATE_SHIPMENT_ERR: `Vytvorenie zásielky sa nepodarilo`,
     UPDATE_SHIPMENT_ERR: `Aktualizácia zásielky sa nepodarilo`,
     DELETE_SHIPMENT_ERR: `Odstránenie zásielky sa nepodarilo`,
@@ -44,5 +50,14 @@ module.exports = {
     SHIPMENT_MONGO_ID: `Nesprávný formát identifikacného čísla`,
     SHIPMENT_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
     SHIPMENT_COLUMN_NAME_MATCHES: `Nesprávný formát názov stľpca`,
-    SHIPMENT_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`
+    SHIPMENT_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`,
+
+    INVOICE_INVOICE_LENGHT: `Minimálna dlžka adresi faktúri je 3 a maximalná je 255`,
+    INVOICE_INVOICE_URL: `Nesprávný formát adresi pre faktúru`,
+    INVOICE_PARCEL_ID_INT: `Nesprávný formát identifikacného čísla balíka`,
+    INVOICE_ID_INT: `Nesprávný formát identifikacného čísla`,
+    INVOICE_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
+    INVOICE_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`,
+    INVOICE_COLUMN_NAME_ALPHA: `Nesprávný formát názov stľpca`,
+    INVOICE_UNIQUE: `Faktúra už existuje, už bola vygenerovaná`
 };

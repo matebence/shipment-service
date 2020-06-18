@@ -1,14 +1,10 @@
 const {validationResult, check} = require('express-validator/check');
-const crypto = require('crypto-js');
+const fs = require('fs');
 
 const strings = require('../../resources/strings');
 const database = require("../models");
 
-const Accounts = require('../component/resilient.component');
-const Shipments = database.shipments;
-
-const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_PAGE_NUMBER = 1;
+const Invoices = database.invoices;
 
 exports.create = {
     authorize: (req, res, next) => {
@@ -31,29 +27,14 @@ exports.create = {
                 nav: `${req.protocol}://${req.get('host')}`
             });
         }
-        next();
+        next()
     },
     validate: [
-        check('shipments[*].courier')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
-        check('shipments[*].parcelId')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
-        check('shipments[*].from')
-            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
-        check('shipments[*].to')
-            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
-        check('shipments[*].status')
-            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
-        check('shipments[*].price')
-            .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
-        check('shipments[*].express')
-            .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
-        check('shipments[*].startDate')
-            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
-        check('shipments[*].endDate')
-            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+        check('invoice')
+            .isLength({min: 3, max: 255}).withMessage(strings.INVOICE_INVOICE_LENGHT)
+            .isURL().withMessage(strings.INVOICE_INVOICE_URL),
+        check('parcelId')
+            .isBase64().withMessage(strings.INVOICE_PARCEL_ID_INT),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -70,27 +51,32 @@ exports.create = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices(req.body).save()]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
                     session.endSession();
                     return res.status(201).json(data, [
-                        {rel: "shipment", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/${data._id}`}]);
+                        {rel: "invoices", method: "GET", href: `${req.protocol}://${req.get('host')}/api/invoices/${data._id}`}]);
                 });
             } else {
                 session.abortTransaction().then(() => {
                     session.endSession();
                 });
-                throw strings.CREATE_SHIPMENT_ERR;
+                throw strings.CREATE_INVOICE_ERR;
             }
         }).catch(err => {
-            return res.status(500).json({
+            const response = {
                 timestamp: new Date().toISOString(),
-                message: strings.CREATE_SHIPMENT_ERR,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
-            });
+            };
+            if (err.code === 11000) {
+                response.message = strings.INVOICE_UNIQUE;
+                return res.status(500).json(response);
+            }
+            response.message = strings.CREATE_INVOICE_ERR;
+            return res.status(500).json(response);
         });
     }
 };
@@ -109,7 +95,7 @@ exports.delete = {
     },
     validate: [
         check('id')
-            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
+            .isMongoId().withMessage(strings.INVOICE_ID_INT),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -126,7 +112,7 @@ exports.delete = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.delete({_id: database.mongoose.Types.ObjectId(req.params.id), deleted: false})]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.delete({_id: database.mongoose.Types.ObjectId(req.params.id), deleted: false})]).then(([session, data]) => {
             session.startTransaction();
             if (data.n === 1) {
                 session.commitTransaction().then(() => {
@@ -138,7 +124,7 @@ exports.delete = {
                     session.endSession();
                     return res.status(400).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.GET_SHIPMENT_ERR,
+                        message: strings.GET_INVOICE_ERR,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
@@ -147,7 +133,7 @@ exports.delete = {
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
-                message: strings.DELETE_SHIPMENT_ERR,
+                message: strings.DELETE_INVOICE_ERR,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
@@ -157,7 +143,7 @@ exports.delete = {
 
 exports.update = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -176,31 +162,16 @@ exports.update = {
                 nav: `${req.protocol}://${req.get('host')}`
             });
         }
-        next();
+        next()
     },
     validate: [
         check('id')
-            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
-        check('courier')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_COURIER_ID_INT),
+            .isMongoId().withMessage(strings.INVOICE_ID_INT),
+        check('invoice')
+            .isLength({min: 3, max: 255}).withMessage(strings.INVOICE_INVOICE_LENGHT)
+            .isURL().withMessage(strings.INVOICE_INVOICE_URL),
         check('parcelId')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
-        check('from')
-            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
-        check('to')
-            .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
-        check('status')
-            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
-        check('price')
-            .isFloat({min: 1.00}).withMessage(strings.SHIPMENT_PRICE_FLOAT),
-        check('express')
-            .isBoolean().withMessage(strings.SHIPMENT_EXPRESS_BOOLEAN),
-        check('startDate')
-            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
-        check('endDate')
-            .optional().matches(/^[2020-9999]{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])T[0-23]{2}:[0-59]{2}:[0-59]{2}.\d+Z$/).withMessage(strings.SHIPMENT_DATE),
+            .isBase64().withMessage(strings.INVOICE_PARCEL_ID_INT),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -217,7 +188,7 @@ exports.update = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findOneAndUpdate({_id: req.params.id}, req.body)]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.findOneAndUpdate({_id: req.params.id}, req.body)]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
@@ -229,26 +200,31 @@ exports.update = {
                     session.endSession();
                     return res.status(500).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.UPDATE_SHIPMENT_ERR,
+                        message: strings.UPDATE_INVOICE_ERR,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
                 });
             }
         }).catch(err => {
-            return res.status(400).json({
+            const response = {
                 timestamp: new Date().toISOString(),
-                message: strings.GET_SHIPMENT_ERR,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
-            });
+            };
+            if (err.code === 11000) {
+                response.message = strings.INVOICE_UNIQUE;
+                return res.status(500).json(response);
+            }
+            response.message = strings.GET_INVOICE_ERR;
+            return res.status(400).json(response);
         });
     }
 };
 
 exports.get = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -260,7 +236,7 @@ exports.get = {
     },
     validate: [
         check('id')
-            .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
+            .isMongoId().withMessage(strings.INVOICE_ID_INT),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -277,22 +253,24 @@ exports.get = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.findOne({_id: req.params.id, deleted: false}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"})]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.findOne({_id: req.params.id, deleted: false })]).then(([session, data]) => {
             session.startTransaction();
             if (data) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    req.shipments = data;
-                    req.hateosLinks = [{rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                        {rel: "all-shipments", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${DEFAULT_PAGE_NUMBER}/limit/${DEFAULT_PAGE_SIZE}`}];
-                    next();
+                    const file = fs.createReadStream(`${global.appRoot}/public/invoices/${data.invoice}`);
+                    const stat = fs.statSync(`${global.appRoot}/public/invoices/${data.invoice}`);
+                    res.setHeader('Content-Length', stat.size);
+                    res.setHeader('Content-Type', 'application/pdf');
+                    res.setHeader('Content-Disposition', `attachment; filename=${data.invoice}`);
+                    file.pipe(res);
                 });
             } else {
                 session.abortTransaction().then(() => {
                     session.endSession();
                     return res.status(400).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.GET_SHIPMENT_ERR,
+                        message: strings.GET_INVOICE_ERR,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
@@ -301,64 +279,17 @@ exports.get = {
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
-                message: strings.SHIPMENT_NOT_FOUND,
+                message: strings.INVOICE_NOT_FOUND,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
-        });
-    },
-    fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
-        const accounts = req.shipments.courier;
-
-        proxy.post('/accounts/join/accountId', {data: [req.shipments.courier]}).then(response => {
-            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
-            database.redis.setex(crypto.MD5(`accounts-${accounts}`).toString(), 3600, JSON.stringify(response.data));
-
-            const shipments = [req.shipments].map(e => {
-                const {userName, email} = response.data.find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-            }).pop();
-
-            return res.status(200).json(shipments, req.hateosLinks);
-        }).catch(err => {
-            req.cacheId = accounts;
-            next();
-        });
-    },
-    fetchDataFromCache: (req, res, next) => {
-        database.redis.get(crypto.MD5(`accounts-${req.cacheId}`).toString(), (err, data) => {
-            if (!data) {
-                return res.status(500).json({
-                    timestamp: new Date().toISOString(),
-                    message: strings.SHIPMENT_NOT_FOUND,
-                    error: true,
-                    nav: `${req.protocol}://${req.get('host')}`
-                });
-            } else{
-                try{
-                    const shipments = [req.shipments].map(e => {
-                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-                    }).pop();
-
-                    return res.status(200).json(shipments, req.hateosLinks);
-                }catch(err){
-                    return res.status(500).json({
-                        timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
-                        error: true,
-                        nav: `${req.protocol}://${req.get('host')}`
-                    });
-                }
-            }
         });
     }
 };
 
 exports.getAll = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -370,9 +301,9 @@ exports.getAll = {
     },
     validate: [
         check('pageNumber')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_PAGE_NUMBER_INT),
+            .isInt({min: 1}).withMessage(strings.INVOICE_PAGE_NUMBER_INT),
         check('pageSize')
-            .isInt({min: 1}).withMessage(strings.SHIPMENT_PAGE_SIZE_INT),
+            .isInt({min: 1}).withMessage(strings.INVOICE_PAGE_SIZE_INT),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -389,22 +320,21 @@ exports.getAll = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.find({deleted: false}).sort('createdAt').skip((Number(req.params.pageNumber) - 1) * Number(req.params.pageSize)).limit(Number(req.params.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    req.shipments = data;
-                    req.hateosLinks = [{rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
-                        {rel: "next-range", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/page/${1 + Number(req.params.pageNumber)}/limit/${req.params.pageSize}`}];
-                    next();
+                    return res.status(206).json({data}, [
+                        {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
+                        {rel: "next-range", method: "GET", href: `${req.protocol}://${req.get('host')}/api/invoices/page/${1 + Number(req.params.pageNumber)}/limit/${req.params.pageSize}`}]);
                 });
             } else {
                 session.abortTransaction().then(() => {
                     session.endSession();
                     return res.status(400).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
+                        message: strings.INVOICE_NOT_FOUND,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
@@ -413,65 +343,17 @@ exports.getAll = {
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
-                message: strings.SHIPMENT_NOT_FOUND,
+                message: strings.INVOICE_NOT_FOUND,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
-        });
-    },
-    fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
-        const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
-
-        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
-            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
-            response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
-
-            const shipments = req.shipments.map(e => {
-                const {userName, email} = response.data.find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-            });
-
-            return res.status(206).json({data: shipments}, req.hateosLinks);
-        }).catch(err => {
-            req.cacheId = accounts;
-            next();
-        });
-    },
-    fetchDataFromCache: (req, res, next) => {
-        database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!data) {
-                return res.status(500).json({
-                    timestamp: new Date().toISOString(),
-                    message: strings.SHIPMENT_NOT_FOUND,
-                    error: true,
-                    nav: `${req.protocol}://${req.get('host')}`
-                });
-            } else {
-                try{
-                    data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
-                    const shipments = req.shipments.map(e => {
-                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-                    });
-
-                    return res.status(206).json({data: shipments}, req.hateosLinks);
-                } catch(err) {
-                    return res.status(500).json({
-                        timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
-                        error: true,
-                        nav: `${req.protocol}://${req.get('host')}`
-                    });
-                }
-            }
         });
     }
 };
 
 exports.search = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_COURIER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -490,7 +372,7 @@ exports.search = {
                 nav: `${req.protocol}://${req.get('host')}`
             });
         }
-        next();
+        next()
     },
     inDatabase: (req, res, next) => {
         const pagination = req.body.pagination;
@@ -516,27 +398,25 @@ exports.search = {
                 }
             });
         }
-        Shipments.countDocuments({deleted: false, ...search}, (err, count) => {
+        Invoices.countDocuments({deleted: false, ...search}, (err, count) => {
             hateosLinks.push({rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl});
-            if (Number(pagination.pageNumber) > 1) hateosLinks.push({rel: "has-prev", method: "POST", href: `${req.protocol}://${req.get('host')}/api/shipments/search`});
-            if ((Number(pagination.pageNumber) * Number(pagination.pageSize)) < count) hateosLinks.push({rel: "has-next", method: "POST", href: `${req.protocol}://${req.get('host')}/api/shipments/search`});
+            if (Number(pagination.pageNumber) > 1) hateosLinks.push({rel: "has-prev", method: "POST", href: `${req.protocol}://${req.get('host')}/api/invoices/search`});
+            if ((Number(pagination.pageNumber) * Number(pagination.pageSize)) < count) hateosLinks.push({rel: "has-next", method: "POST", href: `${req.protocol}://${req.get('host')}/api/invoices/search`});
         });
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...search}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.find({deleted: false, ...search}).sort(order).skip((Number(pagination.pageNumber) - 1) * Number(pagination.pageSize)).limit(Number(pagination.pageSize))]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    req.shipments = data;
-                    req.hateosLinks = hateosLinks;
-                    next();
+                    return res.status(200).json({data}, hateosLinks);
                 });
             } else {
                 session.abortTransaction().then(() => {
                     session.endSession();
                     return res.status(400).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
+                        message: strings.INVOICE_NOT_FOUND,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
@@ -545,58 +425,10 @@ exports.search = {
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
-                message: strings.SHIPMENT_NOT_FOUND,
+                message: strings.INVOICE_NOT_FOUND,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });
-        });
-    },
-    fetchDataFromService: (req, res, next) => {
-        const proxy = Accounts.resilient("ACCOUNT-SERVICE");
-        const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
-
-        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
-            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
-            response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
-
-            const shipments = req.shipments.map(e => {
-                const {userName, email} = response.data.find(x => x.accountId === e.courier);
-                return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-            });
-
-            return res.status(200).json({data: shipments}, req.hateosLinks);
-        }).catch(err => {
-            req.cacheId = accounts;
-            next();
-        });
-    },
-    fetchDataFromCache: (req, res, next) => {
-        database.redis.mget(req.cacheId.map(e => {return crypto.MD5(`accounts-${e}`).toString()}), (err, data) => {
-            if (!data) {
-                return res.status(500).json({
-                    timestamp: new Date().toISOString(),
-                    message: strings.SHIPMENT_NOT_FOUND,
-                    error: true,
-                    nav: `${req.protocol}://${req.get('host')}`
-                });
-            } else {
-                try {
-                    data = JSON.stringify(data.map(e => {return JSON.parse(e)}));
-                    const shipments = req.shipments.map(e => {
-                        const {userName, email} = JSON.parse(data).find(x => x.accountId === e.courier);
-                        return {...e._doc, courier: {courierId: e.courier, userName: userName, email: email}};
-                    });
-
-                    return res.status(200).json({data: shipments}, req.hateosLinks);
-                } catch(err){
-                    return res.status(500).json({
-                        timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
-                        error: true,
-                        nav: `${req.protocol}://${req.get('host')}`
-                    });
-                }
-            }
         });
     }
 };
@@ -626,7 +458,7 @@ exports.join = {
     },
     validate: [
         check('columnName')
-            .matches(/^_|[a-zA-Z]+$/).withMessage(strings.SHIPMENT_COLUMN_NAME_MATCHES),
+            .isAlpha().withMessage(strings.INVOICE_COLUMN_NAME_ALPHA),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -650,7 +482,7 @@ exports.join = {
             }
         }
 
-        return Promise.all([Shipments.startSession(), Shipments.find({deleted: false, ...ids}).populate({path: "status", model: "status"}).populate({path: "invoice", model: "invoices"})]).then(([session, data]) => {
+        return Promise.all([Invoices.startSession(), Invoices.find({deleted: false, ...ids})]).then(([session, data]) => {
             session.startTransaction();
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
@@ -662,7 +494,7 @@ exports.join = {
                     session.endSession();
                     return res.status(400).json({
                         timestamp: new Date().toISOString(),
-                        message: strings.SHIPMENT_NOT_FOUND,
+                        message: strings.INVOICE_NOT_FOUND,
                         error: true,
                         nav: `${req.protocol}://${req.get('host')}`
                     });
@@ -671,7 +503,7 @@ exports.join = {
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
-                message: strings.SHIPMENT_NOT_FOUND,
+                message: strings.INVOICE_NOT_FOUND,
                 error: true,
                 nav: `${req.protocol}://${req.get('host')}`
             });

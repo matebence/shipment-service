@@ -2,7 +2,7 @@ module.exports = {
     title: "Faktúra",
     currency: "€",
     columns:{
-        courier: "Kuriér",
+        id: "Identifikátor",
         from: "Od",
         to: "Do",
         price: "Cena",

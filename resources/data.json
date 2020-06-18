@@ -25,12 +25,6 @@
       "name": "Doručená"
     }
   ],
-  "invoices": [
-    {
-      "_id": "5edf8982ca0d9d132cd3b8f3",
-      "invoice": "parcel-4-1-1591868749.pdf"
-    }
-  ],
   "shipments": [
     {
       "courier": 4,

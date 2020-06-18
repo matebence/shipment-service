@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require("cors");
+const path = require('path');
 
 const app = express();
 
@@ -21,39 +22,8 @@ client.load({
     profiles: node.profiles.active,
     auth: {user: node.cloud.config.username, pass: node.cloud.config.password}
 }).then(config => {
+    global.appRoot = path.resolve(__dirname);
     config.bootstrap = node;
-
-    const { pdf } = require("./app/component/pdfkit.component");
-
-    const invoice = {
-        shipping: {
-            name: "John Doe",
-            address: "1234 Main Street",
-            city: "San Francisco",
-            state: "CA",
-            country: "US",
-            postal_code: 94111
-        },
-        items: [
-            {
-                item: "TC 100",
-                description: "Toner Cartridge",
-                quantity: 2,
-                amount: 6000
-            },
-            {
-                item: "USB_EXT",
-                description: "USB Cable Extender",
-                quantity: 1,
-                amount: 2000
-            }
-        ],
-        subtotal: 8000,
-        paid: 0,
-        invoice_nr: 1234
-    };
-
-    pdf.init(invoice, "invoice.pdf").addHeader().addCustomerDetails().createTable();
 
     require("./app/component/nodemailer.component")(app, config);
     require("./app/component/eureka.component")(app, config);
@@ -62,8 +32,9 @@ client.load({
 
         require("./app/models")(app, config);
         require("./app/routes/auth.routes")(app, config);
-        require("./app/routes/shipments.routes")(app);
         require("./app/routes/status.routes")(app);
+        require("./app/routes/invoices.routes")(app);
+        require("./app/routes/shipments.routes")(app);
         require("./app/routes/errors.routes")(app);
     });
 

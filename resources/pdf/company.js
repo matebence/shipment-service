@@ -3,5 +3,5 @@ module.exports = {
     city: "Nitra",
     street: "Hlavná 23A",
     country: "Slovakia",
-    logo: `${__dirname}/assets/blesk-default-logo.png`
+    logo: `${global.appRoot}/resources/pdf/assets/blesk-default-logo.png`
 };

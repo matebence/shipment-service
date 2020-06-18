@@ -9,12 +9,29 @@ module.exports = (app, config) => {
 
     module.exports = {
         sendHTMLMaile: (file, variables, account) => {
-            ejs.renderFile(file, variables, (err, data) => {
+            ejs.renderFile(`${global.appRoot}/resources/templates/${file}`, variables, (err, data) => {
                 if (err) return false;
                 transport.sendMail({
                     from: config.get('blesk.nodemailer.from'),
                     html: data,
                     ...account
+                }, (err) => {
+                    return !err;
+                });
+            });
+        },
+        sendAttchMaile: (file, invoice, content, account) => {
+            ejs.renderFile(`${global.appRoot}/resources/templates/${file}`, (err, data) => {
+                if (err) return false;
+                transport.sendMail({
+                    from: config.get('blesk.nodemailer.from'),
+                    html: data,
+                    ...account,
+                    attachments: [{
+                        filename: invoice,
+                        path: `${global.appRoot}/public/invoices/${invoice}`,
+                        contentType: content
+                    }]
                 }, (err) => {
                     return !err;
                 });

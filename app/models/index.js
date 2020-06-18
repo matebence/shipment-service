@@ -43,14 +43,12 @@ module.exports = (app, config) => {
     if (config.get('node.mongoose.create-drop')) mongoose.connection.dropDatabase(config.get('node.datasource.database'));
 
     database.status = require("./status.mode")(mongoose, mongoose.Schema, mongoose.model);
-    database.shipments = require("./shipments.model")(mongoose, mongoose.Schema, mongoose.model);
     database.invoices = require("./invoices.model")(mongoose, mongoose.Schema, mongoose.model);
+    database.shipments = require("./shipments.model")(mongoose, mongoose.Schema, mongoose.model);
 
     database.status.insertMany(data.status, (err, result) => {
-        database.invoices.insertMany(data.invoices, (err, result) => {
-            database.shipments.insertMany(data.shipments, (err, result) => {
-                err ? console.log(strings.DATABASE_SEED_ERR) : console.log(strings.DATABASE_SEED)
-            });
+        database.shipments.insertMany(data.shipments, (err, result) => {
+            err ? console.log(strings.DATABASE_SEED_ERR) : console.log(strings.DATABASE_SEED)
         });
     });
 
