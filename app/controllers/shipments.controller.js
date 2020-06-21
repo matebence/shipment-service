@@ -40,10 +40,10 @@ exports.create = {
             .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
         check('shipments[*].from')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
+            .matches(/^[\D ]+$/).withMessage(strings.SHIPMENT_FROM_MATHCES),
         check('shipments[*].to')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
+            .matches(/^[\D ]+$/).withMessage(strings.SHIPMENT_TO_MATHCES),
         check('shipments[*].status')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
         check('shipments[*].price')
@@ -187,10 +187,10 @@ exports.update = {
             .isInt({min: 1}).withMessage(strings.SHIPMENT_PARCEL_ID_INT),
         check('from')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_FROM_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_FROM_ASCII),
+            .matches(/^[\D ]+$/).withMessage(strings.SHIPMENT_FROM_MATHCES),
         check('to')
             .isLength({min: 3, max: 64}).withMessage(strings.SHIPMENT_TO_LENGHT)
-            .isAscii(['sk-SK']).withMessage(strings.SHIPMENT_TO_ASCII),
+            .matches(/^[\D ]+$/).withMessage(strings.SHIPMENT_TO_MATHCES),
         check('status')
             .isMongoId().withMessage(strings.SHIPMENT_MONGO_ID),
         check('price')

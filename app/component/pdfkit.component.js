@@ -5,10 +5,10 @@ const company = require("../../resources/pdf/company");
 const invoice = require("../../resources/pdf/invoice");
 
 exports.invoice = {
-    path: "public/invoices", doc: null, invoice: null,
-    init(data, filename){
+    path: null, doc: null, data: null,
+    init(data, path){
         this.doc = new pdfkit({size: invoice.style.size, margin: 50});
-        this.path = `${this.path}/${filename}`;
+        this.path = path;
         this.data = data;
 
         return this;

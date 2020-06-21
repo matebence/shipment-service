@@ -32,9 +32,7 @@ exports.create = {
     validate: [
         check('invoice')
             .isLength({min: 3, max: 255}).withMessage(strings.INVOICE_INVOICE_LENGHT)
-            .isURL().withMessage(strings.INVOICE_INVOICE_URL),
-        check('parcelId')
-            .isBase64().withMessage(strings.INVOICE_PARCEL_ID_INT),
+            .matches(/^\w+\d+.pdf$/).withMessage(strings.INVOICE_INVOICE_MATCHES),
 
         (req, res, next) => {
             const errors = validationResult(req);
@@ -169,9 +167,7 @@ exports.update = {
             .isMongoId().withMessage(strings.INVOICE_ID_INT),
         check('invoice')
             .isLength({min: 3, max: 255}).withMessage(strings.INVOICE_INVOICE_LENGHT)
-            .isURL().withMessage(strings.INVOICE_INVOICE_URL),
-        check('parcelId')
-            .isBase64().withMessage(strings.INVOICE_PARCEL_ID_INT),
+            .matches(/^\w+\d+.pdf$/).withMessage(strings.INVOICE_INVOICE_MATCHES),
 
         (req, res, next) => {
             const errors = validationResult(req);

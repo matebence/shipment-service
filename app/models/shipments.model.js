@@ -34,7 +34,6 @@ module.exports = (mongoose, schema, model) => {
             invoice: {
                 type: schema.Types.ObjectId,
                 ref: "invoices",
-                required: true
             },
             price: {
                 type: Number,
@@ -59,13 +58,13 @@ module.exports = (mongoose, schema, model) => {
         proxy.post('/parcels/join/id', {data: [docs[0].parcelId]}).then(response => {
             if (response.status < 300) {
                 const data = response.data.pop();
-                const checksum = {id: 1, shipments: docs, sender: data.sender};
                 const name = `${crypto.MD5(data.sender.name + data.sender.senderId).toString()}.pdf`;
 
                 docs.map(e => e.invoice = name);
 
                 Invoices({invoice: name}).save().then(result => { if (!result) return;
-                    invoice.init(checksum, name).addHeader().addCustomerDetails().createTable();
+                    const checksum = {id: result._id, shipments: docs, sender: data.sender};
+                    invoice.init(checksum, `${global.appRoot}/public/invoices/${name}`).addHeader().addCustomerDetails().createTable();
                     mailer.sendAttchMaile("invoiceNotification.ejs", name, 'application/pdf', {
                         to: data.sender.email,
                         subject: 'Blesk s.r.o. faktúra'
