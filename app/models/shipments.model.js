@@ -58,7 +58,7 @@ module.exports = (mongoose, schema, model) => {
         proxy.post('/parcels/join/id', {data: [docs[0].parcelId]}).then(response => {
             if (response.status < 300) {
                 const data = response.data.pop();
-                const name = `${crypto.MD5(data.sender.name + data.sender.senderId).toString()}.pdf`;
+                const name = `${crypto.MD5(data.sender.name + data.sender.senderId + data.id).toString()}.pdf`;
 
                 docs.map(e => e.invoice = name);
 
