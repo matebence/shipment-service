@@ -6,6 +6,10 @@ module.exports = (mongoose, schema, model) => {
                 type: String,
                 required: true,
                 unique: true
+            },
+            account: {
+                type: String,
+                required: true,
             }
         },
         {collection: "invoices", timestamps: {createdAt: 'createdAt'}}

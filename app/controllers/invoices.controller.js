@@ -1,4 +1,5 @@
 const {validationResult, check} = require('express-validator/check');
+const crypto = require('crypto-js');
 const fs = require('fs');
 
 const strings = require('../../resources/strings');
@@ -8,7 +9,7 @@ const Invoices = database.invoices;
 
 exports.create = {
     authorize: (req, res, next) => {
-        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_CLIENT'])) {
+        if (!req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN', 'ROLE_MANAGER'])) {
             return res.status(401).json({
                 timestamp: new Date().toISOString(),
                 message: strings.AUTH_ERR,
@@ -254,12 +255,20 @@ exports.get = {
             if (data) {
                 session.commitTransaction().then(() => {
                     session.endSession();
-                    const file = fs.createReadStream(`${global.appRoot}/public/invoices/${data.invoice}`);
-                    const stat = fs.statSync(`${global.appRoot}/public/invoices/${data.invoice}`);
-                    res.setHeader('Content-Length', stat.size);
-                    res.setHeader('Content-Type', 'application/pdf');
-                    res.setHeader('Content-Disposition', `attachment; filename=${data.invoice}`);
-                    file.pipe(res);
+                    if(data.account === crypto.MD5(req.jwt.user_name + req.jwt.account_id).toString() || req.hasRole(['ROLE_SYSTEM', 'ROLE_ADMIN'])){
+                        const file = fs.createReadStream(`${global.appRoot}/public/invoices/${data.invoice}`);
+                        const stat = fs.statSync(`${global.appRoot}/public/invoices/${data.invoice}`);
+                        res.setHeader('Content-Length', stat.size);
+                        res.setHeader('Content-Type', 'application/pdf');
+                        res.setHeader('Content-Disposition', `attachment; filename=${data.invoice}`);
+                        return file.pipe(res);
+                    }
+                    return res.status(401).json({
+                        timestamp: new Date().toISOString(),
+                        message: strings.AUTH_ERR,
+                        error: true,
+                        nav: `${req.protocol}://${req.get('host')}`
+                    });
                 });
             } else {
                 session.abortTransaction().then(() => {
@@ -321,6 +330,7 @@ exports.getAll = {
             if (data.length > 0 || data !== undefined) {
                 session.commitTransaction().then(() => {
                     session.endSession();
+                    data.map(e => e.invoice = `${req.protocol}://${req.get('host')}/api/invoices/${e._id}`);
                     return res.status(206).json({data}, [
                         {rel: "self", method: "GET", href: req.protocol + '://' + req.get('host') + req.originalUrl},
                         {rel: "next-range", method: "GET", href: `${req.protocol}://${req.get('host')}/api/invoices/page/${1 + Number(req.params.pageNumber)}/limit/${req.params.pageSize}`}]);
