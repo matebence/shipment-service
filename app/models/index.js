@@ -47,9 +47,9 @@ module.exports = (app, config) => {
     database.shipments = require("./shipments.model")(mongoose, mongoose.Schema, mongoose.model);
 
     database.status.insertMany(data.status, (err, result) => {
-        database.shipments.insertMany(data.shipments, (err, result) => {
+        // database.shipments.insertMany(data.shipments, (err, result) => {
             err ? console.log(strings.DATABASE_SEED_ERR) : console.log(strings.DATABASE_SEED)
-        });
+        // });
     });
 
     module.exports = database;
