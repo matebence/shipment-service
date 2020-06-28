@@ -14,9 +14,8 @@ exports.invoice = {
         return this;
     },
     addHeader(){
-        this.doc.image(company.logo, 50, 45, {width: 50}).fillColor(invoice.style.fillColor).fontSize(20).font(invoice.style.bold)
-            .text(company.name, 110, 57).fontSize(10).font(invoice.style.font)
-            .text(company.name, 200, 50, {align: "right"})
+        this.doc.image(company.logo, 50, 45, {width: 80}).fillColor(invoice.style.fillColor).fontSize(10).font(invoice.style.bold)
+            .text(company.name, 200, 50, {align: "right"}).font(invoice.style.font)
             .text(`${company.city}, ${company.street}`, 200, 65, {align: "right"})
             .text(`${company.city}, ${company.country}`, 200, 80, {align: "right"}).font(invoice.style.bold).moveDown();
 

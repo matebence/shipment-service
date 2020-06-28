@@ -33,6 +33,7 @@ client.load({
         require("./app/models")(app, config);
         require("./app/routes/auth.routes")(app, config);
         require("./app/routes/status.routes")(app);
+        require("./app/routes/prices.routes")(app);
         require("./app/routes/invoices.routes")(app);
         require("./app/routes/shipments.routes")(app);
         require("./app/routes/errors.routes")(app);

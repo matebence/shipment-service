@@ -60,9 +60,7 @@ module.exports = (mongoose, schema, model) => {
                 const data = response.data.pop();
                 const name = `${crypto.MD5(data.sender.name + data.sender.senderId + data.id).toString()}.pdf`;
 
-                docs.map(e => e.invoice = name);
-
-                Invoices({invoice: name, account: crypto.MD5(data.sender.userName + data.sender.senderId).toString()}).save().then(result => { if (!result) return;
+                Invoices({_id: docs[0].invoice, invoice: name, account: crypto.MD5(data.sender.userName + data.sender.senderId).toString()}).save().then(result => { if (!result) return;
                     const checksum = {id: result._id, shipments: docs, sender: data.sender};
                     invoice.init(checksum, `${global.appRoot}/public/invoices/${name}`).addHeader().addCustomerDetails().createTable();
                     mailer.sendAttchMaile("invoiceNotification.ejs", name, 'application/pdf', {

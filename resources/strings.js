@@ -18,6 +18,12 @@ module.exports = {
     GET_STATUS_ERR: `Ľutujeme ale státus zásielky s identifikačním číslom neexistuje`,
     STATUS_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadný státus zásielky`,
 
+    CREATE_PRICE_ERR: `Vytvorenie cenníka sa nepodarilo`,
+    UPDATE_PRICE_ERR: `Aktualizácia cenníka sa nepodarilo`,
+    DELETE_PRICE_ERR: `Odstránenie cenníka sa nepodarilo`,
+    GET_PRICE_ERR: `Ľutujeme, ale cenník neexistuje`,
+    PRICE_NOT_FOUND: `Ľutujeme ale nenašiel sa žiadný cenník`,
+
     CREATE_INVOICE_ERR: `Vytvorenie faktúry sa nepodarilo, skúste znova`,
     UPDATE_INVOICE_ERR: `Aktualizácia faktúry sa nepodarilo, skúste znova`,
     DELETE_INVOICE_ERR: `Odstránenie faktúry sa nepodarilo, skúste znova`,
@@ -59,5 +65,8 @@ module.exports = {
     INVOICE_PAGE_NUMBER_INT: `Nesprávný formát číslo strany`,
     INVOICE_PAGE_SIZE_INT: `Nesprávný formát veľkosť strany`,
     INVOICE_COLUMN_NAME_ALPHA: `Nesprávný formát názov stľpca`,
-    INVOICE_UNIQUE: `Faktúra už existuje, už bola vygenerovaná`
+    INVOICE_UNIQUE: `Faktúra už existuje, už bola vygenerovaná`,
+
+    PRICES_PRICE_FLOAT: `Nesprávný formát ceny zásielky`,
+    PRICE_MONGO_ID: `Nesprávný formát identifikacného čísla`,
 };
