@@ -39,9 +39,7 @@
       "to": "Nitra",
       "status": "5edf8982ca0d9d132cd3b8df",
       "price": 8.50,
-      "express": false,
-      "startDate": "2020-06-09T13:15:15.628Z",
-      "endDate": null
+      "express": false
     }
   ]
 }
