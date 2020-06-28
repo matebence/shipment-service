@@ -6,6 +6,7 @@ const database = require("../models");
 
 const Accounts = require('../component/resilient.component');
 const Shipments = database.shipments;
+const Prices = database.prices;
 
 const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_PAGE_NUMBER = 1;
@@ -70,20 +71,27 @@ exports.create = {
         }
     ],
     inDatabase: (req, res, next) => {
-        return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
-            session.startTransaction();
-            if (data) {
-                session.commitTransaction().then(() => {
-                    session.endSession();
-                    return res.status(201).json(data, [
-                        {rel: "shipment", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/${data._id}`}]);
-                });
-            } else {
-                session.abortTransaction().then(() => {
-                    session.endSession();
-                });
-                throw strings.CREATE_SHIPMENT_ERR;
-            }
+        Prices.findOne({_id: "5ef89dcd56f69d17643556e8"}).then(result => {
+            req.body.shipments.forEach(e => {
+                e.price += result.price;
+                e.invoice = database.mongoose.Types.ObjectId()
+            });
+
+            return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
+                session.startTransaction();
+                if (data) {
+                    session.commitTransaction().then(() => {
+                        session.endSession();
+                        return res.status(201).json(data, [
+                            {rel: "shipment", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/${data._id}`}]);
+                    });
+                } else {
+                    session.abortTransaction().then(() => {
+                        session.endSession();
+                    });
+                    throw strings.CREATE_SHIPMENT_ERR;
+                }
+            });
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
