@@ -319,7 +319,7 @@ exports.get = {
         const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.courier;
 
-        proxy.post('/accounts/join/accountId', {data: [req.shipments.courier]}).then(response => {
+        proxy.post('/accounts/join/accountId', {data: {ids: [req.shipments.courier]}}).then(response => {
             if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             database.redis.setex(crypto.MD5(`accounts-${accounts}`).toString(), 3600, JSON.stringify(response.data));
 
@@ -431,7 +431,7 @@ exports.getAll = {
         const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
-        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
+        proxy.post('/accounts/join/accountId', {data: {ids: accounts}}).then(response => {
             if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
 
@@ -563,7 +563,7 @@ exports.search = {
         const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.filter(e => e.courier).map(x => x.courier);
 
-        proxy.post('/accounts/join/accountId', {data: accounts}).then(response => {
+        proxy.post('/accounts/join/accountId', {data: {ids: accounts}}).then(response => {
             if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             response.data.forEach(e => {database.redis.setex(crypto.MD5(`accounts-${e.accountId}`).toString(), 3600, JSON.stringify(e))});
 
