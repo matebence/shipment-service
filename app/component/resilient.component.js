@@ -21,7 +21,7 @@ module.exports = (app, config, callback) => {
             return !err && res.statusCode >= 300
         }).on('request:finish', function (err, res) {
             if (!err && res.socket._httpMessage.path.toString().includes("accounts") && '_embedded' in res.data) {
-                res.data = res.data._embedded.accountsList
+                res.data = res.data._embedded.accountJoinValuesByColumnList
             }
         });
         callback()
