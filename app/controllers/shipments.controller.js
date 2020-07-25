@@ -5,6 +5,9 @@ const strings = require('../../resources/strings');
 const database = require("../models");
 
 const Accounts = require('../component/resilient.component');
+const Parcels = require('../component/resilient.component');
+const Users = require('../component/resilient.component');
+
 const Shipments = database.shipments;
 const Prices = database.prices;
 
@@ -70,28 +73,94 @@ exports.create = {
             next()
         }
     ],
-    inDatabase: (req, res, next) => {
+    addCompanyProfit: (req, res, next) => {
         Prices.findOne({_id: "5ef89dcd56f69d17643556e8"}).then(result => {
             req.body.shipments.forEach(e => {
                 e.price += result.price;
                 e.invoice = database.mongoose.Types.ObjectId()
             });
-
-            return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
-                session.startTransaction();
-                if (data) {
-                    session.commitTransaction().then(() => {
-                        session.endSession();
-                        return res.status(201).json(data, [
-                            {rel: "shipment", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/${data._id}`}]);
-                    });
-                } else {
-                    session.abortTransaction().then(() => {
-                        session.endSession();
-                    });
-                    throw strings.CREATE_SHIPMENT_ERR;
-                }
+            next();
+        }).catch(err => {
+            return res.status(404).json({
+                timestamp: new Date().toISOString(),
+                message: strings.CREATE_SHIPMENT_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
             });
+        });
+    },
+    checkBalance: (req, res, next) => {
+        const proxy = Parcels.resilient("PARCEL-SERVICE");
+        const parcels = req.body.shipments[0];
+
+        proxy.post('/parcels/join/id', {data: [parcels.parcelId]}).then(response => {
+            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
+            database.redis.setex(crypto.MD5(`parcels-${parcels.parcelId}`).toString(), 3600, JSON.stringify(response.data));
+            const sender = response.data.pop().sender;
+            if (Number(sender.balance) >= Number(parcels.price)){
+                req.body.sender = {
+                    senderId: sender.senderId,
+                    actualBalance: Number(sender.balance) - Number(parcels.price)
+                };
+                next()
+            }else{
+                return res.status(422).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.CREATE_SHIPMENT_ERR,
+                    error: true,
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            }
+        }).catch(err => {
+            return res.status(500).json({
+                timestamp: new Date().toISOString(),
+                message: strings.CREATE_SHIPMENT_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        });
+    },
+    updateUserBalance: (req, res, next) => {
+        const proxy = Users.resilient("USER-SERVICE");
+        proxy.get(`/users/${req.body.sender.senderId}`).then(response => {
+            if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
+            const user = response.data;
+            user.balance = req.body.sender.actualBalance;
+            proxy.put(`/users/${req.body.sender.senderId}`, {data: user}).then(response => {
+                if (Number(response.status) === 204) next();
+                return new Error(strings.PROXY_ERR);
+            }).catch(err => {
+                return res.status(500).json({
+                    timestamp: new Date().toISOString(),
+                    message: strings.CREATE_SHIPMENT_ERR,
+                    error: true,
+                    nav: `${req.protocol}://${req.get('host')}`
+                });
+            });
+        }).catch(err => {
+            return res.status(404).json({
+                timestamp: new Date().toISOString(),
+                message: strings.CREATE_SHIPMENT_ERR,
+                error: true,
+                nav: `${req.protocol}://${req.get('host')}`
+            });
+        });
+    },
+    inDatabase: (req, res, next) => {
+        return Promise.all([Shipments.startSession(), Shipments.insertMany(req.body.shipments)]).then(([session, data]) => {
+            session.startTransaction();
+            if (data) {
+                session.commitTransaction().then(() => {
+                    session.endSession();
+                    return res.status(201).json(data, [
+                        {rel: "shipment", method: "GET", href: `${req.protocol}://${req.get('host')}/api/shipments/${data._id}`}]);
+                });
+            } else {
+                session.abortTransaction().then(() => {
+                    session.endSession();
+                });
+                throw strings.CREATE_SHIPMENT_ERR;
+            }
         }).catch(err => {
             return res.status(500).json({
                 timestamp: new Date().toISOString(),
@@ -319,7 +388,7 @@ exports.get = {
         const proxy = Accounts.resilient("ACCOUNT-SERVICE");
         const accounts = req.shipments.courier;
 
-        proxy.post('/accounts/join/accountId', {data: {ids: [req.shipments.courier]}}).then(response => {
+        proxy.post('/accounts/join/accountId', {data: {ids: [accounts]}}).then(response => {
             if (response.status >= 300 && !'error' in response.data) return new Error(strings.PROXY_ERR);
             database.redis.setex(crypto.MD5(`accounts-${accounts}`).toString(), 3600, JSON.stringify(response.data));
 
