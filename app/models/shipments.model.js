@@ -4,7 +4,7 @@ module.exports = (mongoose, schema, model) => {
 
     const Invoices = mongoose.model('invoices');
 
-    const Accounts = require('../component/resilient.component');
+    const Parcels = require('../component/resilient.component');
     const mailer = require('../component/nodemailer.component');
     const {invoice} = require("../../app/component/pdfkit.component");
 
@@ -54,7 +54,7 @@ module.exports = (mongoose, schema, model) => {
     ).plugin(mongooseDelete, {deletedAt: true});
 
     shipmentSchema.pre('insertMany', async function (next, docs) {
-        const proxy = Accounts.resilient("PARCEL-SERVICE");
+        const proxy = Parcels.resilient("PARCEL-SERVICE");
         proxy.post('/parcels/join/id', {data: [docs[0].parcelId]}).then(response => {
             if (response.status < 300) {
                 const data = response.data.pop();
@@ -76,7 +76,7 @@ module.exports = (mongoose, schema, model) => {
         postShipment = await this.model.findOne(this.getQuery()).populate({path: "status", model: "status"});
         if (preShipment.status._id.equals(postShipment.status._id)) return;
 
-        const proxy = Accounts.resilient("PARCEL-SERVICE");
+        const proxy = Parcels.resilient("PARCEL-SERVICE");
         proxy.post('/parcels/join/id', {data: [postShipment.parcelId]}).then(response => {
             if (response.status < 300) {
                 mailer.sendHTMLMaile("shipmentNotification.ejs", {shipmentStatus: postShipment.status.name}, {

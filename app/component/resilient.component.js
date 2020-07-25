@@ -20,7 +20,10 @@ module.exports = (app, config, callback) => {
         }).addFailStrategy((err, res) => {
             return !err && res.statusCode >= 300
         }).on('request:finish', function (err, res) {
-            if (!err && res.socket._httpMessage.path.toString().includes("accounts") && '_embedded' in res.data) {
+            if (!err && res.socket._httpMessage.path.toString().includes("users") && 'data' in res && '_embedded' in res.data) {
+                res.data = res.data._embedded.usersList
+            }
+            if (!err && res.socket._httpMessage.path.toString().includes("accounts") && 'data' in res && '_embedded' in res.data) {
                 res.data = res.data._embedded.accountJoinValuesByColumnList
             }
         });

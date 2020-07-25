@@ -2,7 +2,7 @@ module.exports = app => {
     const shipments = require("../controllers/shipments.controller");
     const router = require("express").Router();
 
-    router.post("/", shipments.create.authorize, shipments.create.checkBody, shipments.create.validate, shipments.create.inDatabase);
+    router.post("/", shipments.create.authorize, shipments.create.checkBody, shipments.create.validate, shipments.create.addCompanyProfit, shipments.create.checkBalance, shipments.create.updateUserBalance, shipments.create.inDatabase);
 
     router.delete("/:id", shipments.delete.authorize, shipments.delete.validate, shipments.delete.inDatabase);
 
