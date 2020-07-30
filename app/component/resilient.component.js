@@ -24,7 +24,7 @@ module.exports = (app, config, callback) => {
                 res.data = res.data._embedded.usersList
             }
             if (!err && res.socket._httpMessage.path.toString().includes("accounts") && 'data' in res && '_embedded' in res.data) {
-                res.data = res.data._embedded.accountJoinValuesByColumnList
+                res.data = res.data._embedded.accountsJoinList
             }
         });
         callback()
