@@ -6,4 +6,4 @@ COPY . .
 RUN mkdir public
 RUN mkdir public/invoices
 RUN chmod 777 public
-CMD ["./wait-for-it.sh" , "messaging-service:7400" , "--strict" , "--timeout=235" , "--" , "node", "server.js"]
+CMD ["./wait-for-it.sh" , "place-service:5000" , "--strict" , "--timeout=360" , "--" , "node", "server.js"]
