@@ -388,6 +388,8 @@ exports.search = {
             Object.keys(search).map(function (key, index) {
                 if(isNaN(search[key]) &&  new RegExp("^[0-9a-fA-F]{24}$").test(search[key])){
                     search[key] = database.mongoose.Types.ObjectId(search[key])
+                } else if (Array.isArray(search[key])){
+                    search[key] = {$in: search[key]}
                 } else if (isNaN(search[key])){
                     search[key] = {$regex: new RegExp("^.*" + search[key] + '.*', "i")}
                 }
