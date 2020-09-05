@@ -5,10 +5,6 @@
       "name": "Nová"
     },
     {
-      "_id": "5edf8982ca0d9d132cd3b8de",
-      "name": "Objednané na prepravu"
-    },
-    {
       "_id": "5edf8982ca0d9d132cd3b8df",
       "name": "Registrované dopravcom"
     },
@@ -17,12 +13,12 @@
       "name": "V sklade, pripravené na vyzdvihnutie kuriérom"
     },
     {
-      "_id": "5edf8982ca0d9d132cd3b8e1",
-      "name": "V preprave"
-    },
-    {
       "_id": "5edf8982ca0d9d132cd3b8e2",
       "name": "Doručená"
+    },
+    {
+      "_id": "5edf8982ca0d9d132cd3b8e1",
+      "name": "Recenzované a schvalené"
     }
   ],
   "prices": [
@@ -35,8 +31,8 @@
     {
       "courier": 4,
       "parcelId": 1,
-      "from": "Nesvady",
-      "to": "Nitra",
+      "from": "Slovakia, Nesvady",
+      "to": "Slovakia, Nitra",
       "status": "5edf8982ca0d9d132cd3b8df",
       "price": 8.50,
       "express": false
