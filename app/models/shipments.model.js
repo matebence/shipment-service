@@ -5,6 +5,7 @@ module.exports = (mongoose, schema, model) => {
     const Invoices = mongoose.model('invoices');
 
     const Parcels = require('../component/resilient.component');
+    const Users = require('../component/resilient.component');
     const mailer = require('../component/nodemailer.component');
     const {invoice} = require("../../app/component/pdfkit.component");
 
@@ -84,6 +85,25 @@ module.exports = (mongoose, schema, model) => {
                     subject: 'Zmena stavu zásielky'
                 });
             }
+        })
+    });
+
+    shipmentSchema.post('findOneAndUpdate', async function () {
+        postShipment = await this.model.findOne(this.getQuery()).populate({path: "status", model: "status"});
+        if (preShipment.status._id.equals(postShipment.status._id) || !preShipment.status._id.equals("5edf8982ca0d9d132cd3b8e2")) return;
+
+        const proxy = Users.resilient("USER-SERVICE");
+        proxy.get(`/users/${postShipment.courier}`).then(response => {
+            const user = response.data;
+            user.balance = Number(user.balance) + postShipment.price;
+            proxy.put(`/users/${postShipment.courier}`, {data: user}).then(response => {
+                if (response.status < 300) {
+                    mailer.sendHTMLMaile("statusNotification.ejs", {}, {
+                        to: user.email,
+                        subject: 'Odovzdanie balíka prebehľa úspešne'
+                    });
+                }
+            })
         })
     });
 
