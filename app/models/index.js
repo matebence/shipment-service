@@ -49,8 +49,10 @@ module.exports = (app, config) => {
 
     database.status.insertMany(data.status, (err, result) => {
         database.prices.insertMany(data.prices, (err, result) => {
-            database.shipments.insertMany(data.shipments, (err, result) => {
-                err ? console.log(strings.DATABASE_SEED_ERR) : console.log(strings.DATABASE_SEED)
+            database.invoices.insertMany(data.invoices, (err, result) => {
+                database.shipments.insertMany(data.shipments, (err, result) => {
+                    err ? console.log(strings.DATABASE_SEED_ERR) : console.log(strings.DATABASE_SEED)
+                });
             });
         });
     });
