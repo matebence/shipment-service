@@ -4,8 +4,7 @@ module.exports = (mongoose, schema, model) => {
         {
             name: {
                 type: String,
-                required: true,
-                unique: true
+                required: true
             }
         },
         {collection: "status", timestamps: {createdAt: 'createdAt'}}
