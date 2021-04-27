@@ -38,7 +38,7 @@
     "node-fetch": "^2.6.0",
     "nodemailer": "^6.4.8",
     "pdfkit": "^0.11.0",
-    "redis": "^3.0.2",
+    "redis": "^3.1.1",
     "resilient": "^0.4.0",
     "zipkin": "^0.22.0",
     "zipkin-context-cls": "^0.22.0",
